@@ -1,5 +1,6 @@
 using DG.Tweening;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class WordSelectionUI : MonoBehaviour
@@ -14,6 +15,11 @@ public class WordSelectionUI : MonoBehaviour
     
     private List<int> _selectedKeys = new List<int>();
     private List<WordButtonUI> _wordButtons = new List<WordButtonUI>();
+
+
+    [Header("GridSettings")] 
+    public int xSpacing;
+    public int xCount;
 
     private void Awake()
     {
@@ -36,6 +42,12 @@ public class WordSelectionUI : MonoBehaviour
 
     private void CreateWordButtons()
     {
+        CreatePage(1);
+    }
+
+    public void CreatePage(int pageNo)
+    {
+        print(pageNo);
         foreach (Transform child in contentParent)
         {
             Destroy(child.gameObject);
@@ -43,16 +55,76 @@ public class WordSelectionUI : MonoBehaviour
 
         _wordButtons.Clear();
         _selectedKeys.Clear();
-
-        for (int i = 0; i < wordsManager.latinWords.Count; i++)
+        if (pageNo == 1)
         {
-            WordButtonUI newButton = Instantiate(wordButtonPrefab, contentParent);
+            for (int i = 0; i < wordsManager.latinWords.Count; i++)
+            {
+                var pos = new Vector2(-800 + i * xSpacing,0);
 
-            string text = wordsManager.latinWords[i] + " = " + wordsManager.turkishWords[i];
+                if (i < xCount)
+                {
+                    pos = new Vector2(-800 + i * xSpacing,0);
+                }
+                else if (i < xCount * 2)
+                {
+                    pos = new Vector2(-800 + (i - xCount) * xSpacing, -200);
+                }
+                else if (i < xCount * 3)
+                {
+                    pos = new Vector2(-800 + (i - xCount * 2) * xSpacing, -200*2);
+                }
+                else
+                {
+                    return;
+                }
+            
+                WordButtonUI newButton = Instantiate(wordButtonPrefab, contentParent);
+                var rectTransform = newButton.GetComponent<RectTransform>();
+                rectTransform.anchoredPosition = pos;
 
-            newButton.Init(this, i, text);
-            _wordButtons.Add(newButton);
+                string text = wordsManager.latinWords[i] + " = " + wordsManager.turkishWords[i];
+
+                newButton.Init(this, i, text);
+                _wordButtons.Add(newButton);
+            }
         }
+        else if (pageNo == 2)
+        {
+            for (int i = 0; i < wordsManager.latinWords.Count; i++)
+            {
+                if (i >= 15)
+                {
+                    var pos = new Vector2(-800 + (i - 15) * xSpacing,0);
+
+                    if (i - 15 < xCount)
+                    {
+                        pos = new Vector2(-800 + (i - 15) * xSpacing,0);
+                    }
+                    else if (i - 15 < xCount * 2)
+                    {
+                        pos = new Vector2(-800 + (i - xCount - 15) * xSpacing, -200);
+                    }
+                    else if (i - 15 < xCount * 3)
+                    {
+                        pos = new Vector2(-800 + (i - xCount * 2 - 15) * xSpacing, -200*2);
+                    }
+                    else
+                    {
+                        return;
+                    }
+            
+                    WordButtonUI newButton = Instantiate(wordButtonPrefab, contentParent);
+                    var rectTransform = newButton.GetComponent<RectTransform>();
+                    rectTransform.anchoredPosition = pos;
+
+                    string text = wordsManager.latinWords[i] + " = " + wordsManager.turkishWords[i];
+
+                    newButton.Init(this, i, text);
+                    _wordButtons.Add(newButton);
+                }
+            }
+        }
+        
     }
 
     public void WordButtonClicked(int wordIndex, bool isSelected)
@@ -88,18 +160,17 @@ public class WordSelectionUI : MonoBehaviour
     {
         if (_selectedKeys.Count < 3)
         {
-            Debug.Log("En az 3 sözcük seçmelisin.");
+            Debug.Log("En az 3 sï¿½zcï¿½k seï¿½melisin.");
             return;
         }
 
         if (_selectedKeys.Count % 3 != 0)
         {
-            Debug.Log("Þimdilik 3'ün katý kadar sözcük seçmelisin.");
+            Debug.Log("ï¿½imdilik 3'ï¿½n katï¿½ kadar sï¿½zcï¿½k seï¿½melisin.");
             return;
         }
 
         Hide();
         uIManager.StartSelectedWordsGame(_selectedKeys);
     }
-
 }
