@@ -1,10 +1,17 @@
 using DG.Tweening;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 
 public class WordSelectionUI : MonoBehaviour
 {
+    public int startX = -700;
+    public int startY = -60;
+    public int ySpacing = 130;
+
+    public TextMeshProUGUI selectedCountTMP;
+
     public UIManager uIManager;
     public WordsManager wordsManager;
 
@@ -32,6 +39,8 @@ public class WordSelectionUI : MonoBehaviour
         _canvasGroup.alpha = 0;
         _canvasGroup.DOFade(1, .15f);
 
+        _selectedKeys.Clear();
+        UpdateSelectedCountText();
         CreateWordButtons();
     }
 
@@ -47,84 +56,53 @@ public class WordSelectionUI : MonoBehaviour
 
     public void CreatePage(int pageNo)
     {
-        print(pageNo);
         foreach (Transform child in contentParent)
         {
             Destroy(child.gameObject);
         }
 
         _wordButtons.Clear();
-        _selectedKeys.Clear();
-        if (pageNo == 1)
+
+        int wordsPerPage = 15;
+        int startIndex = (pageNo - 1) * wordsPerPage;
+        int endIndex = Mathf.Min(startIndex + wordsPerPage, wordsManager.latinWords.Count);
+
+        for (int i = startIndex; i < endIndex; i++)
         {
-            for (int i = 0; i < wordsManager.latinWords.Count; i++)
+            int localIndex = i - startIndex;
+
+            Vector2 pos;
+
+            if (localIndex < xCount)
             {
-                var pos = new Vector2(-800 + i * xSpacing,0);
-
-                if (i < xCount)
-                {
-                    pos = new Vector2(-800 + i * xSpacing,0);
-                }
-                else if (i < xCount * 2)
-                {
-                    pos = new Vector2(-800 + (i - xCount) * xSpacing, -200);
-                }
-                else if (i < xCount * 3)
-                {
-                    pos = new Vector2(-800 + (i - xCount * 2) * xSpacing, -200*2);
-                }
-                else
-                {
-                    return;
-                }
-            
-                WordButtonUI newButton = Instantiate(wordButtonPrefab, contentParent);
-                var rectTransform = newButton.GetComponent<RectTransform>();
-                rectTransform.anchoredPosition = pos;
-
-                string text = wordsManager.latinWords[i] + " = " + wordsManager.turkishWords[i];
-
-                newButton.Init(this, i, text);
-                _wordButtons.Add(newButton);
+                pos = new Vector2(startX + localIndex * xSpacing, startY);
             }
-        }
-        else if (pageNo == 2)
-        {
-            for (int i = 0; i < wordsManager.latinWords.Count; i++)
+            else if (localIndex < xCount * 2)
             {
-                if (i >= 15)
-                {
-                    var pos = new Vector2(-800 + (i - 15) * xSpacing,0);
-
-                    if (i - 15 < xCount)
-                    {
-                        pos = new Vector2(-800 + (i - 15) * xSpacing,0);
-                    }
-                    else if (i - 15 < xCount * 2)
-                    {
-                        pos = new Vector2(-800 + (i - xCount - 15) * xSpacing, -200);
-                    }
-                    else if (i - 15 < xCount * 3)
-                    {
-                        pos = new Vector2(-800 + (i - xCount * 2 - 15) * xSpacing, -200*2);
-                    }
-                    else
-                    {
-                        return;
-                    }
-            
-                    WordButtonUI newButton = Instantiate(wordButtonPrefab, contentParent);
-                    var rectTransform = newButton.GetComponent<RectTransform>();
-                    rectTransform.anchoredPosition = pos;
-
-                    string text = wordsManager.latinWords[i] + " = " + wordsManager.turkishWords[i];
-
-                    newButton.Init(this, i, text);
-                    _wordButtons.Add(newButton);
-                }
+                pos = new Vector2(startX + (localIndex - xCount) * xSpacing, startY - ySpacing);
             }
+            else
+            {
+                pos = new Vector2(startX + (localIndex - xCount * 2) * xSpacing, startY - ySpacing * 2);
+            }
+
+            WordButtonUI newButton = Instantiate(wordButtonPrefab, contentParent);
+
+            RectTransform rectTransform = newButton.GetComponent<RectTransform>();
+            rectTransform.anchoredPosition = pos;
+
+            string text = wordsManager.latinWords[i] + " = " + wordsManager.turkishWords[i];
+
+            newButton.Init(this, i, text);
+
+            if (_selectedKeys.Contains(i))
+            {
+                newButton.SetSelected(true);
+            }
+
+            _wordButtons.Add(newButton);
         }
-        
+
     }
 
     public void WordButtonClicked(int wordIndex, bool isSelected)
@@ -143,17 +121,23 @@ public class WordSelectionUI : MonoBehaviour
                 _selectedKeys.Remove(wordIndex);
             }
         }
+
+        UpdateSelectedCountText();
     }
 
     public void SelectAllButtonPressed()
     {
-        _selectedKeys.Clear();
-
-        for (int i = 0; i < wordsManager.latinWords.Count; i++)
+        foreach (WordButtonUI button in _wordButtons)
         {
-            _selectedKeys.Add(i);
-            _wordButtons[i].SetSelected(true);
+            if (!_selectedKeys.Contains(button.WordIndex))
+            {
+                _selectedKeys.Add(button.WordIndex);
+            }
+
+            button.SetSelected(true);
         }
+
+        UpdateSelectedCountText();
     }
 
     public void GoOnButtonPressed()
@@ -172,5 +156,25 @@ public class WordSelectionUI : MonoBehaviour
 
         Hide();
         uIManager.StartSelectedWordsGame(_selectedKeys);
+    }
+
+
+    private void UpdateSelectedCountText()
+    {
+
+        int count = _selectedKeys.Count;
+
+        if (count == 0)
+        {
+            selectedCountTMP.text = "Seçilen: 0";
+        }
+        else if (count % 3 == 0)
+        {
+            selectedCountTMP.text = "Seçilen: " + count + " ✓";
+        }
+        else
+        {
+            selectedCountTMP.text = "Seçilen: " + count + " / 3'ün katı olmalı";
+        }
     }
 }

@@ -40,6 +40,7 @@ public class CoinUI : MonoBehaviour
     public void Hide()
     {
         _canvasGroup.DOFade(0, .1f).OnComplete(() => gameObject.SetActive(false));  // canvas grubu gizle ve gizleme iþlemi bittiðinde objeyi tamamen kapat
+
     }
 
 }

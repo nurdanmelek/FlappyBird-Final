@@ -6,9 +6,9 @@ public class PageButton : MonoBehaviour
 {
     public WordSelectionUI wordSelectionUI;
     public int pageNo;
-    private void OnMouseDown()
+
+    public void PageButtonPressed()
     {
-        print(pageNo);
         wordSelectionUI.CreatePage(pageNo);
     }
 }

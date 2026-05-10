@@ -4,7 +4,11 @@ using UnityEngine;
 
 public class HintUI : MonoBehaviour
 {
-   public TapUI tapUI;
+
+    public CoinUI coinUI;
+    public HealthUI healthUI;
+    
+    public TapUI tapUI;
     
     public WordsManager wordsManager;
     public TextMeshProUGUI word1;
@@ -32,6 +36,9 @@ public class HintUI : MonoBehaviour
         word3.text = wordsManager.latinWords[key3] + " = " + wordsManager.turkishWords[key3];
 
         tapUI.Hide();
+        coinUI.Hide();
+        healthUI.Hide();
+
     }
     public void Hide()
     {

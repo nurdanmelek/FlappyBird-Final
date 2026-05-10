@@ -4,11 +4,14 @@ using UnityEngine.UI;
 
 public class WordButtonUI : MonoBehaviour
 {
+    
+
     public TextMeshProUGUI wordTMP;
     public Button button;
 
     private WordSelectionUI _wordSelectionUI;
     private int _wordIndex;
+    public int WordIndex => _wordIndex;
     private bool _isSelected;
 
     public void Init(WordSelectionUI wordSelectionUI, int wordIndex, string wordText)

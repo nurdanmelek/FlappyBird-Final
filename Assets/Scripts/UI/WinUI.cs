@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class WinUI : MonoBehaviour
 {
+    public CoinUI coinUI;
+    public HealthUI healthUI;
+
     public TapUI tapUI;
     public UIManager uIManager;
     
@@ -30,6 +33,9 @@ public class WinUI : MonoBehaviour
         _canvasGroup.DOFade(1, .1f);
 
         tapUI.Hide();
+        coinUI.Hide();
+        healthUI.Hide();
+
     }
 
 
