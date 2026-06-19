@@ -80,14 +80,21 @@ public class GameDirector : MonoBehaviour
         wordsManager.MarkCurrentWordsAsCompleted();
         wordsManager.SaveProgress();
 
-        currentLevel++; 
-
         gateManager.StopGateManager();
         obstacleManager.StopRun();
         coinManager.StopCoinSpawnCoroutine();
 
         audioManager.StopMusic();
         audioManager.PlayWinAS();
+
+        if (wordsManager.completedKeys.Count >= wordsManager.selectedStudyKeys.Count)
+        {
+            uIManager.ShowGameCompletedUI();
+            return;
+        }
+
+        currentLevel++;
+
         seedManager.RandomizeSeed();
         uIManager.ShowWinUI();
     }
@@ -102,7 +109,7 @@ public class GameDirector : MonoBehaviour
         obstacleManager.ResetAll();
         obstacleManager.StartRun();
 
-        gateManager.SetSpawnInterval(7f);
+        gateManager.SetSpawnInterval(4f);
         gateManager.RestartGateManager();
 
         bird.RestartBird();

@@ -28,11 +28,14 @@ public class UIManager : MonoBehaviour
 
     public SeedManager seedManager;
 
+    public GameCompletedUI gameCompletedUI;
+
     public void GameStarted()
     {
         winUI.Hide();
         loseUI.Hide();
         hintUI.Hide();
+        gameCompletedUI.Hide();
 
         wordSelectionUI.Hide();
 
@@ -131,5 +134,11 @@ public class UIManager : MonoBehaviour
         gameDirector.CreateLevelData();
 
         hintUI.Show(0);
+    }
+
+    public void ShowGameCompletedUI()
+    {
+        gameCompletedUI.Show();
+        HideInGameUI();
     }
 }

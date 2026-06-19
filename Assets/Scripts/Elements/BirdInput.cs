@@ -5,11 +5,11 @@ public class BirdInput : MonoBehaviour
 {
     private Rigidbody2D _rb;
 
-    public float jumpForce = 5f;
-    public float moveSpeed = 3f;
-    public float sprintMultiplier = 2f;
+    public float jumpForce = 10f;
+   
+   
 
-    private float _horizontalInput;
+    
 
     private void Awake()
     {
@@ -18,24 +18,11 @@ public class BirdInput : MonoBehaviour
 
     private void Update()
     {
-        // Saða-sola input al
-        _horizontalInput = Input.GetAxisRaw("Horizontal");
-
-        // Yukarý flap
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
         {
-            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, jumpForce);
+            _rb.linearVelocity = new Vector2(0f, jumpForce);
         }
     }
-
-    private void FixedUpdate()
-    {
-        float currentSpeed = moveSpeed;
-
-        _rb.linearVelocity = new Vector2(_horizontalInput * currentSpeed, _rb.linearVelocity.y);
-    }
-
-
 
 }
 
