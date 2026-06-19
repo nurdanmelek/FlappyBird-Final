@@ -1,0 +1,1 @@
+Şimdi EnemySpawner'ı sahneye ekleyeceğim ve SplitEnemy prefab'ına kendi prefab referansını ayarlayacağım.

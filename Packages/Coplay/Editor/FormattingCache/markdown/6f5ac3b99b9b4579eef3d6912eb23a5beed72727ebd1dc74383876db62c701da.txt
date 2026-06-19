@@ -1,0 +1,1 @@
+Şimdi "Enemy" tag'ini oluşturup prefab'lara atayacağım.

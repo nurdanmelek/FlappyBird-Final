@@ -1,0 +1,246 @@
+<color=#569CD6>using</color> System<color=#D4D4D4>.</color>Collections<color=#D4D4D4>.</color>Generic<color=#D4D4D4>;</color>
+<color=#569CD6>using</color> UnityEngine<color=#D4D4D4>;</color>
+
+/// <summary>
+/// Central manager for the enemy system.
+/// Coordinates spawning, tracks active enemies, and handles game state changes.
+/// </summary>
+<color=#569CD6>public</color> <color=#569CD6>class</color> <color=#FFA500>EnemyManager</color> <color=#D4D4D4>:</color> <color=#4EC9B0>MonoBehaviour</color>
+<color=#D4D4D4>{</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"References"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Reference to the enemy spawner"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> EnemySpawner <color=#B48EAD>enemySpawner</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Reference to the game director (optional)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> GameDirector <color=#B48EAD>gameDirector</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Settings"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Auto-start spawning on game start"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#569CD6>bool</color> <color=#B48EAD>autoStart</color> <color=#D4D4D4>=</color> <color=#569CD6>false</color><color=#D4D4D4>;</color>
+
+    <color=#57A64A>// Statistics</color>
+    <color=#569CD6>private</color> <color=#4EC9B0>int</color> <color=#B48EAD>totalEnemiesSpawned</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0</color><color=#D4D4D4>;</color>
+    <color=#569CD6>private</color> <color=#4EC9B0>int</color> <color=#B48EAD>totalEnemiesKilled</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0</color><color=#D4D4D4>;</color>
+    <color=#569CD6>private</color> <color=#4EC9B0>int</color> <color=#B48EAD>totalEnemiesEscaped</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0</color><color=#D4D4D4>;</color>
+
+    <color=#57A64A>// Events</color>
+    <color=#569CD6>public</color> System<color=#D4D4D4>.</color>Action<color=#D4D4D4><</color><color=#4EC9B0>int</color><color=#D4D4D4>></color> <color=#B48EAD>OnEnemyCountChanged</color><color=#D4D4D4>;</color>
+    <color=#569CD6>public</color> System<color=#D4D4D4>.</color>Action<color=#D4D4D4><</color>BaseEnemy<color=#D4D4D4>></color> <color=#B48EAD>OnEnemySpawned</color><color=#D4D4D4>;</color>
+    <color=#569CD6>public</color> System<color=#D4D4D4>.</color>Action<color=#D4D4D4><</color>BaseEnemy<color=#D4D4D4>></color> <color=#B48EAD>OnEnemyKilled</color><color=#D4D4D4>;</color>
+
+    <color=#9B9B9B>#region Unity Lifecycle</color>
+
+    <color=#569CD6>private</color> <color=#569CD6>void</color> <color=#FFA500>Awake</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#57A64A>// Auto-find spawner if not assigned</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#B48EAD>enemySpawner</color> == <color=#569CD6>null</color><color=#D4D4D4>)</color>
+            <color=#B48EAD>enemySpawner</color> <color=#D4D4D4>=</color> GetComponentInChildren<color=#D4D4D4><</color>EnemySpawner<color=#D4D4D4>></color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+        <color=#57A64A>// Auto-find game director if not assigned</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#B48EAD>gameDirector</color> == <color=#569CD6>null</color><color=#D4D4D4>)</color>
+            <color=#B48EAD>gameDirector</color> <color=#D4D4D4>=</color> FindFirstObjectByType<color=#D4D4D4><</color>GameDirector<color=#D4D4D4>></color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#569CD6>private</color> <color=#569CD6>void</color> <color=#FFA500>Start</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#B48EAD>enemySpawner</color> != <color=#569CD6>null</color><color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            <color=#57A64A>// Subscribe to spawner events</color>
+            <color=#B48EAD>enemySpawner</color><color=#D4D4D4>.</color>OnEnemySpawned += HandleEnemySpawned<color=#D4D4D4>;</color>
+            <color=#B48EAD>enemySpawner</color><color=#D4D4D4>.</color>OnEnemyDestroyed += HandleEnemyDestroyed<color=#D4D4D4>;</color>
+        <color=#D4D4D4>}</color>
+
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#B48EAD>autoStart</color><color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            <color=#FFA500>StartEnemySystem</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        <color=#D4D4D4>}</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#569CD6>private</color> <color=#569CD6>void</color> <color=#FFA500>OnDestroy</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#B48EAD>enemySpawner</color> != <color=#569CD6>null</color><color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            <color=#B48EAD>enemySpawner</color><color=#D4D4D4>.</color>OnEnemySpawned -= HandleEnemySpawned<color=#D4D4D4>;</color>
+            <color=#B48EAD>enemySpawner</color><color=#D4D4D4>.</color>OnEnemyDestroyed -= HandleEnemyDestroyed<color=#D4D4D4>;</color>
+        <color=#D4D4D4>}</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#9B9B9B>#endregion</color>
+
+    <color=#9B9B9B>#region Public Methods</color>
+
+    /// <summary>
+    /// Initialize and start the enemy system for a level
+    /// </summary>
+    <color=#569CD6>public</color> <color=#569CD6>void</color> <color=#FFA500>StartEnemySystem</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#B48EAD>enemySpawner</color> == <color=#569CD6>null</color><color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            <color=#4EC9B0>Debug</color><color=#D4D4D4>.</color><color=#FFA500>LogWarning</color><color=#D4D4D4>(</color><color=#FF69B4>"EnemyManager: No EnemySpawner assigned!"</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            <color=#569CD6>return</color><color=#D4D4D4>;</color>
+        <color=#D4D4D4>}</color>
+
+        <color=#4EC9B0>int</color> level <color=#D4D4D4>=</color> <color=#B48EAD>gameDirector</color> != <color=#569CD6>null</color> ? <color=#B48EAD>gameDirector</color><color=#D4D4D4>.</color>currentLevel <color=#D4D4D4>:</color> <color=#B5CEA8>1</color><color=#D4D4D4>;</color>
+        <color=#B48EAD>enemySpawner</color><color=#D4D4D4>.</color><color=#FFA500>Initialize</color><color=#D4D4D4>(</color>level<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        <color=#B48EAD>enemySpawner</color><color=#D4D4D4>.</color><color=#FFA500>StartSpawning</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+    <color=#D4D4D4>}</color>
+
+    /// <summary>
+    /// Stop the enemy system
+    /// </summary>
+    <color=#569CD6>public</color> <color=#569CD6>void</color> <color=#FFA500>StopEnemySystem</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#B48EAD>enemySpawner</color> != <color=#569CD6>null</color><color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            <color=#B48EAD>enemySpawner</color><color=#D4D4D4>.</color><color=#FFA500>StopSpawning</color><color=#D4D4D4>(</color>);
+        }
+    }
+
+    /// <summary>
+    /// Stop and clear all enemies
+    /// </summary>
+    public void ResetEnemySystem()
+    {
+        if (enemySpawner != null)
+        {
+            enemySpawner.StopAndClearAll();
+        }
+
+        ResetStatistics();
+    }
+
+    /// <summary>
+    /// Pause all enemy movement
+    /// </summary>
+    public void PauseEnemies()
+    {
+        if (enemySpawner != null)
+        {
+            enemySpawner.PauseAllEnemies();
+        }
+    }
+
+    /// <summary>
+    /// Resume all enemy movement
+    /// </summary>
+    public void ResumeEnemies()
+    {
+        if (enemySpawner != null)
+        {
+            enemySpawner.ResumeAllEnemies();
+        }
+    }
+
+    /// <summary>
+    /// Set the current level for difficulty scaling
+    /// </summary>
+    public void SetLevel(int level)
+    {
+        if (enemySpawner != null)
+        {
+            enemySpawner.SetLevel(level);
+        }
+    }
+
+    /// <summary>
+    /// Get count of currently active enemies
+    /// </summary>
+    public int GetActiveEnemyCount()
+    {
+        return enemySpawner != null ? enemySpawner.GetActiveEnemyCount() : 0;
+    }
+
+    /// <summary>
+    /// Get all active enemies
+    /// </summary>
+    public List<BaseEnemy> GetActiveEnemies()
+    {
+        return enemySpawner != null ? enemySpawner.GetActiveEnemies() : new List<BaseEnemy>();
+    }
+
+    /// <summary>
+    /// Spawn a specific enemy at a position
+    /// </summary>
+    public BaseEnemy SpawnEnemy(GameObject prefab, Vector3 position)
+    {
+        return enemySpawner != null ? enemySpawner.SpawnEnemy(prefab, position) : null;
+    }
+
+    /// <summary>
+    /// Kill all active enemies (for power-ups, etc.)
+    /// </summary>
+    public void KillAllEnemies()
+    {
+        if (enemySpawner == null) return;
+
+        var enemies = enemySpawner.GetActiveEnemies();
+        foreach (var enemy in enemies)
+        {
+            if (enemy != null)
+            {
+                enemy.Kill();
+            }
+        }
+    }
+
+    #endregion
+
+    #region Statistics
+
+    /// <summary>
+    /// Get total enemies spawned this session
+    /// </summary>
+    public int GetTotalSpawned() => totalEnemiesSpawned;
+
+    /// <summary>
+    /// Get total enemies killed this session
+    /// </summary>
+    public int GetTotalKilled() => totalEnemiesKilled;
+
+    /// <summary>
+    /// Get total enemies that escaped (went off-screen)
+    /// </summary>
+    public int GetTotalEscaped() => totalEnemiesEscaped;
+
+    /// <summary>
+    /// Reset all statistics
+    /// </summary>
+    public void ResetStatistics()
+    {
+        totalEnemiesSpawned = 0;
+        totalEnemiesKilled = 0;
+        totalEnemiesEscaped = 0;
+    }
+
+    #endregion
+
+    #region Event Handlers
+
+    private void HandleEnemySpawned(BaseEnemy enemy)
+    {
+        totalEnemiesSpawned++;
+        
+        // Subscribe to kill event
+        enemy.OnEnemyKilled += HandleEnemyKilled;
+        
+        OnEnemySpawned?.Invoke(enemy);
+        OnEnemyCountChanged?.Invoke(GetActiveEnemyCount());
+    }
+
+    private void HandleEnemyDestroyed(BaseEnemy enemy)
+    {
+        // Check if it was killed or escaped
+        // (If killed, OnEnemyKilled would have been called first)
+        
+        OnEnemyCountChanged?.Invoke(GetActiveEnemyCount());
+    }
+
+    private void HandleEnemyKilled(BaseEnemy enemy)
+    {
+        totalEnemiesKilled++;
+        enemy.OnEnemyKilled -= HandleEnemyKilled;
+        OnEnemyKilled?.Invoke(enemy);
+    }
+
+    #endregion
+}

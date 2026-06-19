@@ -1,0 +1,34 @@
+Unity 2D’de Flappy Bird tarzı bir oyunum var. Kuş sağa doğru ilerliyor ve obstacle’lardan kaçıyor. Oyunda “mikrop” enemy’leri bulunuyor. Şu anda mikroplar sadece sola doğru hareket eden basit obstacle’lar.
+
+Bunu daha modüler ve geliştirilebilir bir enemy sistemine dönüştürmek istiyorum.
+
+Aşağıdaki enemy tiplerini destekleyen bir yapı oluştur:
+
+NormalEnemy
+Sadece sola hareket eder.
+FollowEnemy
+Belirli bir mesafede kuşu takip etmeye başlar.
+Hareket çok agresif olmasın, yumuşak takip etsin.
+ExplodeEnemy
+Kuşa yaklaşınca scale büyüsün.
+Çarpışırsa ekstra hasar verebilsin.
+SplitEnemy
+Yok edildiğinde iki küçük enemy oluştursun.
+RotateEnemy
+İleri giderken dairesel/sinus hareket yapsın.
+
+İstediğim yapı:
+
+BaseEnemy abstract class veya interface sistemi kullanılsın.
+Her enemy kendi behavior scriptine sahip olsun.
+EnemySpawner istediği enemy prefabını spawn edebilsin.
+Inspector’dan kolayca ayarlanabilir olsun.
+Mevcut Bird collider sistemiyle uyumlu çalışsın.
+Rigidbody2D yerine mümkün olduğunca kontrollü transform movement kullanılsın.
+Kodlar temiz ve scalable olsun.
+
+Ek olarak:
+
+Hangi enemy’nin spawn olacağını random seçebilen bir sistem oluştur.
+İlerleyen level’larda daha zor enemy tipleri spawn olabilsin.
+Örnek prefab hiyerarşisini de açıkla.

@@ -1,0 +1,121 @@
+<color=#569CD6>using</color> UnityEngine<color=#D4D4D4>;</color>
+
+/// <summary>
+/// Configuration for enemy spawning - defines which enemies can spawn and their weights.
+/// Attach to EnemySpawner or use as ScriptableObject for different difficulty levels.
+/// </summary>
+<color=#D4D4D4>[</color>System<color=#D4D4D4>.</color>Serializable<color=#D4D4D4>]</color>
+<color=#569CD6>public</color> <color=#569CD6>class</color> <color=#FFA500>EnemySpawnEntry</color>
+<color=#D4D4D4>{</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"The enemy prefab to spawn"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#569CD6>public</color> <color=#4EC9B0>GameObject</color> <color=#B48EAD>enemyPrefab</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Spawn weight (higher = more likely to spawn)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Range</color><color=#D4D4D4>(</color><color=#B5CEA8>0f</color><color=#D4D4D4>,</color> <color=#B5CEA8>100f</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#569CD6>public</color> <color=#4EC9B0>float</color> <color=#B48EAD>spawnWeight</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Minimum level required for this enemy to spawn"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#569CD6>public</color> <color=#4EC9B0>int</color> <color=#B48EAD>minLevel</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Maximum level for this enemy (0 = no limit)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#569CD6>public</color> <color=#4EC9B0>int</color> <color=#B48EAD>maxLevel</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Speed multiplier for this enemy type"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#569CD6>public</color> <color=#4EC9B0>float</color> <color=#B48EAD>speedMultiplier</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1f</color><color=#D4D4D4>;</color>
+
+    /// <summary>
+    /// Check if this enemy can spawn at the given level
+    /// </summary>
+    <color=#569CD6>public</color> <color=#569CD6>bool</color> <color=#FFA500>CanSpawnAtLevel</color><color=#D4D4D4>(</color><color=#4EC9B0>int</color> level<color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color>level <color=#D4D4D4><</color> <color=#B48EAD>minLevel</color><color=#D4D4D4>)</color> <color=#569CD6>return</color> <color=#569CD6>false</color><color=#D4D4D4>;</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#B48EAD>maxLevel</color> <color=#D4D4D4>></color> <color=#B5CEA8>0</color> && level <color=#D4D4D4>></color> <color=#B48EAD>maxLevel</color><color=#D4D4D4>)</color> <color=#569CD6>return</color> <color=#569CD6>false</color><color=#D4D4D4>;</color>
+        <color=#569CD6>return</color> <color=#569CD6>true</color><color=#D4D4D4>;</color>
+    <color=#D4D4D4>}</color>
+<color=#D4D4D4>}</color>
+
+/// <summary>
+/// ScriptableObject for storing enemy spawn configurations.
+/// Create different configs for different difficulty levels or game modes.
+/// </summary>
+<color=#D4D4D4>[</color><color=#4EC9B0>CreateAssetMenu</color><color=#D4D4D4>(</color>fileName <color=#D4D4D4>=</color> <color=#FF69B4>"EnemySpawnConfig"</color><color=#D4D4D4>,</color> menuName <color=#D4D4D4>=</color> <color=#FF69B4>"Game/Enemy Spawn Config"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+<color=#569CD6>public</color> <color=#569CD6>class</color> <color=#FFA500>EnemySpawnConfig</color> <color=#D4D4D4>:</color> <color=#4EC9B0>ScriptableObject</color>
+<color=#D4D4D4>{</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Spawn Entries"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"List of enemies that can be spawned"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#569CD6>public</color> <color=#4EC9B0>EnemySpawnEntry</color><color=#D4D4D4>[</color><color=#D4D4D4>]</color> <color=#B48EAD>enemies</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Level Scaling"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Base spawn interval in seconds"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#569CD6>public</color> <color=#4EC9B0>float</color> <color=#B48EAD>baseSpawnInterval</color> <color=#D4D4D4>=</color> <color=#B5CEA8>3f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Minimum spawn interval"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#569CD6>public</color> <color=#4EC9B0>float</color> <color=#B48EAD>minSpawnInterval</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Spawn interval reduction per level"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#569CD6>public</color> <color=#4EC9B0>float</color> <color=#B48EAD>intervalReductionPerLevel</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0.1f</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Speed Scaling"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Base enemy speed"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#569CD6>public</color> <color=#4EC9B0>float</color> <color=#B48EAD>baseSpeed</color> <color=#D4D4D4>=</color> <color=#B5CEA8>3f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Speed increase per level"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#569CD6>public</color> <color=#4EC9B0>float</color> <color=#B48EAD>speedIncreasePerLevel</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0.2f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Maximum speed cap"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#569CD6>public</color> <color=#4EC9B0>float</color> <color=#B48EAD>maxSpeed</color> <color=#D4D4D4>=</color> <color=#B5CEA8>8f</color><color=#D4D4D4>;</color>
+
+    /// <summary>
+    /// Get spawn interval for a specific level
+    /// </summary>
+    <color=#569CD6>public</color> <color=#4EC9B0>float</color> <color=#FFA500>GetSpawnInterval</color><color=#D4D4D4>(</color><color=#4EC9B0>int</color> level<color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#4EC9B0>float</color> interval <color=#D4D4D4>=</color> <color=#B48EAD>baseSpawnInterval</color> <color=#D4D4D4>-</color> <color=#D4D4D4>(</color>level <color=#D4D4D4>-</color> <color=#B5CEA8>1</color><color=#D4D4D4>)</color> <color=#D4D4D4>*</color> <color=#B48EAD>intervalReductionPerLevel</color><color=#D4D4D4>;</color>
+        <color=#569CD6>return</color> <color=#4EC9B0>Mathf</color><color=#D4D4D4>.</color><color=#FFA500>Max</color><color=#D4D4D4>(</color>interval<color=#D4D4D4>,</color> <color=#B48EAD>minSpawnInterval</color>);
+    }
+
+    /// <summary>
+    /// Get enemy speed for a specific level
+    /// </summary>
+    public float GetEnemySpeed(int level)
+    {
+        float speed = baseSpeed + (level - 1) * speedIncreasePerLevel;
+        return Mathf.Min(speed, maxSpeed);
+    }
+
+    /// <summary>
+    /// Get a random enemy that can spawn at the given level
+    /// </summary>
+    public EnemySpawnEntry GetRandomEnemy(int level)
+    {
+        // Calculate total weight of available enemies
+        float totalWeight = 0f;
+        foreach (var entry in enemies)
+        {
+            if (entry.CanSpawnAtLevel(level) && entry.enemyPrefab != null)
+            {
+                totalWeight += entry.spawnWeight;
+            }
+        }
+
+        if (totalWeight <= 0f) return null;
+
+        // Random selection based on weight
+        float random = Random.Range(0f, totalWeight);
+        float currentWeight = 0f;
+
+        foreach (var entry in enemies)
+        {
+            if (entry.CanSpawnAtLevel(level) && entry.enemyPrefab != null)
+            {
+                currentWeight += entry.spawnWeight;
+                if (random <= currentWeight)
+                {
+                    return entry;
+                }
+            }
+        }
+
+        return null;
+    }
+}

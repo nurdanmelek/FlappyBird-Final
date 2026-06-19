@@ -1,0 +1,16 @@
+<color=#569CD6>using</color> UnityEngine<color=#D4D4D4>;</color>
+
+/// <summary>
+/// Normal enemy that simply moves left at a constant speed.
+/// The most basic enemy type - serves as the foundation for other behaviors.
+/// </summary>
+<color=#569CD6>public</color> <color=#569CD6>class</color> <color=#FFA500>NormalEnemy</color> <color=#D4D4D4>:</color> BaseEnemy
+<color=#D4D4D4>{</color>
+    <color=#569CD6>public</color> <color=#569CD6>override</color> EnemyType <color=#FFA500>GetEnemyType</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color> => EnemyType<color=#D4D4D4>.</color>Normal<color=#D4D4D4>;</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>override</color> <color=#569CD6>void</color> <color=#FFA500>ExecuteBehavior</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#57A64A>// Simple left movement</color>
+        transform<color=#D4D4D4>.</color><color=#FFA500>Translate</color><color=#D4D4D4>(</color><color=#4EC9B0>Vector3</color><color=#D4D4D4>.</color>left <color=#D4D4D4>*</color> moveSpeed <color=#D4D4D4>*</color> <color=#4EC9B0>Time</color><color=#D4D4D4>.</color>deltaTime<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+    <color=#D4D4D4>}</color>
+<color=#D4D4D4>}</color>

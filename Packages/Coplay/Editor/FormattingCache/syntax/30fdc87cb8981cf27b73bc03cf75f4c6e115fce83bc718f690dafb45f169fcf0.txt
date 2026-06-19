@@ -1,0 +1,14 @@
+------<color=#D4D4D4>-</color> ORIGINAL
+<color=#D4D4D4></color>        <color=#57A64A>// Stop enemy system</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color>enemyManager != <color=#569CD6>null</color><color=#D4D4D4>)</color>
+            enemyManager<color=#D4D4D4>.</color><color=#FFA500>StopAndClearAll</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+        audioManager<color=#D4D4D4>.</color><color=#FFA500>StopMusic</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+=======
+<color=#9B9B9B>        // Stop enemy system
+        if (enemyManager != null)
+            enemyManager.ResetEnemySystem();
+
+        audioManager.StopMusic();
++++++++ NEW
+</color>

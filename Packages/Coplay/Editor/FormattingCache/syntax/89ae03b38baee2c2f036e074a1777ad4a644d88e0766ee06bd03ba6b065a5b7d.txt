@@ -1,0 +1,367 @@
+<color=#569CD6>using</color> System<color=#D4D4D4>.</color>Collections<color=#D4D4D4>;</color>
+<color=#569CD6>using</color> System<color=#D4D4D4>.</color>Collections<color=#D4D4D4>.</color>Generic<color=#D4D4D4>;</color>
+<color=#569CD6>using</color> UnityEngine<color=#D4D4D4>;</color>
+
+/// <summary>
+/// Spawns enemies based on configuration and current level.
+/// Supports random enemy selection with weighted probabilities and difficulty scaling.
+/// </summary>
+<color=#569CD6>public</color> <color=#569CD6>class</color> <color=#FFA500>EnemySpawner</color> <color=#D4D4D4>:</color> <color=#4EC9B0>MonoBehaviour</color>
+<color=#D4D4D4>{</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Spawn Configuration"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"ScriptableObject config (optional - can use inline entries instead)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> EnemySpawnConfig <color=#B48EAD>spawnConfig</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Inline enemy entries (used if no ScriptableObject config)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> EnemySpawnEntry<color=#D4D4D4>[</color><color=#D4D4D4>]</color> <color=#B48EAD>inlineEnemies</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Spawn Settings"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Base spawn interval in seconds"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>baseSpawnInterval</color> <color=#D4D4D4>=</color> <color=#B5CEA8>3f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Minimum spawn interval"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>minSpawnInterval</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Interval reduction per level"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>intervalReductionPerLevel</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0.1f</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Position Settings"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Spawn X position (right side of screen)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>spawnX</color> <color=#D4D4D4>=</color> <color=#B5CEA8>15f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Minimum Y position for spawning"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>minY</color> <color=#D4D4D4>=</color> <color=#D4D4D4>-</color><color=#B5CEA8>4f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Maximum Y position for spawning"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>maxY</color> <color=#D4D4D4>=</color> <color=#B5CEA8>4f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"X position where enemies are destroyed"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>destroyX</color> <color=#D4D4D4>=</color> <color=#D4D4D4>-</color><color=#B5CEA8>15f</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Speed Settings"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Base enemy movement speed"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>baseSpeed</color> <color=#D4D4D4>=</color> <color=#B5CEA8>3f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Speed increase per level"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>speedIncreasePerLevel</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0.2f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Maximum enemy speed"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>maxSpeed</color> <color=#D4D4D4>=</color> <color=#B5CEA8>8f</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"References"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Reference to the bird (auto-found if null)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>Transform</color> <color=#B48EAD>birdTransform</color><color=#D4D4D4>;</color>
+
+    <color=#57A64A>// Runtime state</color>
+    <color=#569CD6>private</color> <color=#4EC9B0>int</color> <color=#B48EAD>currentLevel</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1</color><color=#D4D4D4>;</color>
+    <color=#569CD6>private</color> <color=#569CD6>bool</color> <color=#B48EAD>isSpawning</color> <color=#D4D4D4>=</color> <color=#569CD6>false</color><color=#D4D4D4>;</color>
+    private Coroutine spawnCoroutine;
+    private List<BaseEnemy> activeEnemies = new List<BaseEnemy>();
+
+    // Events
+    public System.Action<BaseEnemy> OnEnemySpawned;
+    public System.Action<BaseEnemy> OnEnemyDestroyed;
+
+    #region Unity Lifecycle
+
+    private void Awake()
+    {
+        // Auto-find bird if not assigned
+        if (birdTransform == null)
+        {
+            var bird = FindFirstObjectByType<Bird>();
+            if (bird != null)
+                birdTransform = bird.transform;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        StopSpawning();
+    }
+
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>
+    /// Initialize the spawner with level settings
+    /// </summary>
+    public void Initialize(int level)
+    {
+        currentLevel = level;
+    }
+
+    /// <summary>
+    /// Start spawning enemies
+    /// </summary>
+    public void StartSpawning()
+    {
+        if (isSpawning) return;
+        
+        isSpawning = true;
+        spawnCoroutine = StartCoroutine(SpawnRoutine());
+    }
+
+    /// <summary>
+    /// Stop spawning enemies
+    /// </summary>
+    public void StopSpawning()
+    {
+        isSpawning = false;
+        
+        if (spawnCoroutine != null)
+        {
+            StopCoroutine(spawnCoroutine);
+            spawnCoroutine = null;
+        }
+    }
+
+    /// <summary>
+    /// Stop spawning and destroy all active enemies
+    /// </summary>
+    public void StopAndClearAll()
+    {
+        StopSpawning();
+        DestroyAllEnemies();
+    }
+
+    /// <summary>
+    /// Destroy all active enemies
+    /// </summary>
+    public void DestroyAllEnemies()
+    {
+        for (int i = activeEnemies.Count - 1; i >= 0; i--)
+        {
+            if (activeEnemies[i] != null)
+            {
+                Destroy(activeEnemies[i].gameObject);
+            }
+        }
+        activeEnemies.Clear();
+    }
+
+    /// <summary>
+    /// Pause all active enemies
+    /// </summary>
+    public void PauseAllEnemies()
+    {
+        foreach (var enemy in activeEnemies)
+        {
+            if (enemy != null)
+                enemy.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// Resume all active enemies
+    /// </summary>
+    public void ResumeAllEnemies()
+    {
+        foreach (var enemy in activeEnemies)
+        {
+            if (enemy != null)
+                enemy.SetActive(true);
+        }
+    }
+
+    /// <summary>
+    /// Spawn a specific enemy type at a position
+    /// </summary>
+    public BaseEnemy SpawnEnemy(GameObject prefab, Vector3 position)
+    {
+        if (prefab == null) return null;
+
+        GameObject enemyObj = Instantiate(prefab, position, Quaternion.identity);
+        BaseEnemy enemy = enemyObj.GetComponent<BaseEnemy>();
+
+        if (enemy != null)
+        {
+            ConfigureEnemy(enemy, 1f);
+            RegisterEnemy(enemy);
+        }
+
+        return enemy;
+    }
+
+    /// <summary>
+    /// Spawn a random enemy based on current level
+    /// </summary>
+    public BaseEnemy SpawnRandomEnemy()
+    {
+        EnemySpawnEntry entry = GetRandomEnemyEntry();
+        if (entry == null || entry.enemyPrefab == null) return null;
+
+        Vector3 spawnPos = GetRandomSpawnPosition();
+        GameObject enemyObj = Instantiate(entry.enemyPrefab, spawnPos, Quaternion.identity);
+        BaseEnemy enemy = enemyObj.GetComponent<BaseEnemy>();
+
+        if (enemy != null)
+        {
+            ConfigureEnemy(enemy, entry.speedMultiplier);
+            RegisterEnemy(enemy);
+        }
+
+        return enemy;
+    }
+
+    /// <summary>
+    /// Set the current level for difficulty scaling
+    /// </summary>
+    public void SetLevel(int level)
+    {
+        currentLevel = Mathf.Max(1, level);
+    }
+
+    /// <summary>
+    /// Get count of active enemies
+    /// </summary>
+    public int GetActiveEnemyCount()
+    {
+        // Clean up null references
+        activeEnemies.RemoveAll(e => e == null);
+        return activeEnemies.Count;
+    }
+
+    /// <summary>
+    /// Get all active enemies
+    /// </summary>
+    public List<BaseEnemy> GetActiveEnemies()
+    {
+        activeEnemies.RemoveAll(e => e == null);
+        return new List<BaseEnemy>(activeEnemies);
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private IEnumerator SpawnRoutine()
+    {
+        while (isSpawning)
+        {
+            float interval = GetSpawnInterval();
+            yield return new WaitForSeconds(interval);
+
+            if (isSpawning)
+            {
+                SpawnRandomEnemy();
+            }
+        }
+    }
+
+    private EnemySpawnEntry GetRandomEnemyEntry()
+    {
+        // Use ScriptableObject config if available
+        if (spawnConfig != null)
+        {
+            return spawnConfig.GetRandomEnemy(currentLevel);
+        }
+
+        // Otherwise use inline entries
+        if (inlineEnemies == null || inlineEnemies.Length == 0)
+            return null;
+
+        // Calculate total weight
+        float totalWeight = 0f;
+        foreach (var entry in inlineEnemies)
+        {
+            if (entry.CanSpawnAtLevel(currentLevel) && entry.enemyPrefab != null)
+            {
+                totalWeight += entry.spawnWeight;
+            }
+        }
+
+        if (totalWeight <= 0f) return null;
+
+        // Random selection
+        float random = Random.Range(0f, totalWeight);
+        float currentWeight = 0f;
+
+        foreach (var entry in inlineEnemies)
+        {
+            if (entry.CanSpawnAtLevel(currentLevel) && entry.enemyPrefab != null)
+            {
+                currentWeight += entry.spawnWeight;
+                if (random <= currentWeight)
+                {
+                    return entry;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private Vector3 GetRandomSpawnPosition()
+    {
+        float y = Random.Range(minY, maxY);
+        return new Vector3(spawnX, y, 0f);
+    }
+
+    private void ConfigureEnemy(BaseEnemy enemy, float speedMultiplier)
+    {
+        float speed = GetEnemySpeed() * speedMultiplier;
+        enemy.Initialize(speed, birdTransform, destroyX);
+    }
+
+    private void RegisterEnemy(BaseEnemy enemy)
+    {
+        activeEnemies.Add(enemy);
+        
+        // Subscribe to destruction event
+        enemy.OnEnemyDestroyed += HandleEnemyDestroyed;
+        
+        OnEnemySpawned?.Invoke(enemy);
+    }
+
+    private void HandleEnemyDestroyed(BaseEnemy enemy)
+    {
+        activeEnemies.Remove(enemy);
+        enemy.OnEnemyDestroyed -= HandleEnemyDestroyed;
+        OnEnemyDestroyed?.Invoke(enemy);
+    }
+
+    private float GetSpawnInterval()
+    {
+        if (spawnConfig != null)
+        {
+            return spawnConfig.GetSpawnInterval(currentLevel);
+        }
+
+        float interval = baseSpawnInterval - (currentLevel - 1) * intervalReductionPerLevel;
+        return Mathf.Max(interval, minSpawnInterval);
+    }
+
+    private float GetEnemySpeed()
+    {
+        if (spawnConfig != null)
+        {
+            return spawnConfig.GetEnemySpeed(currentLevel);
+        }
+
+        float speed = baseSpeed + (currentLevel - 1) * speedIncreasePerLevel;
+        return Mathf.Min(speed, maxSpeed);
+    }
+
+    #endregion
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        // Draw spawn area
+        Gizmos.color = Color.green;
+        Vector3 topRight = new Vector3(spawnX, maxY, 0f);
+        Vector3 bottomRight = new Vector3(spawnX, minY, 0f);
+        Gizmos.DrawLine(topRight, bottomRight);
+        Gizmos.DrawWireSphere(topRight, 0.3f);
+        Gizmos.DrawWireSphere(bottomRight, 0.3f);
+
+        // Draw destroy line
+        Gizmos.color = Color.red;
+        Vector3 topLeft = new Vector3(destroyX, maxY, 0f);
+        Vector3 bottomLeft = new Vector3(destroyX, minY, 0f);
+        Gizmos.DrawLine(topLeft, bottomLeft);
+    }
+#endif
+}

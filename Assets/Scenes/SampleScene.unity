@@ -1794,7 +1794,7 @@ GameObject:
   - component: {fileID: 306574455}
   m_Layer: 0
   m_Name: Bird
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1875,7 +1875,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpForce: 5
-  moveSpeed: 3
+  moveSpeed: 5
   sprintMultiplier: 2
 --- !u!114 &306574453
 MonoBehaviour:
@@ -6623,7 +6623,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faa4bf6f30cc4cb4bb76075a7341111d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firstPipeDelay: 5
+  firstPipeDelay: 0.1
 --- !u!1 &1475315314
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,214 @@
+<color=#569CD6>using</color> UnityEngine<color=#D4D4D4>;</color>
+
+/// <summary>
+/// Enemy that splits into two smaller enemies when killed.
+/// Creates a challenging scenario where destroying one enemy creates two more.
+/// </summary>
+<color=#569CD6>public</color> <color=#569CD6>class</color> <color=#FFA500>SplitEnemy</color> <color=#D4D4D4>:</color> BaseEnemy
+<color=#D4D4D4>{</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Split Settings"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Prefab to spawn when split (if null, spawns copies of self)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>GameObject</color> <color=#B48EAD>splitPrefab</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Number of enemies to spawn on split"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>int</color> <color=#B48EAD>splitCount</color> <color=#D4D4D4>=</color> <color=#B5CEA8>2</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Scale multiplier for split enemies"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>splitScaleMultiplier</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0.6f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Speed multiplier for split enemies"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>splitSpeedMultiplier</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1.2f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Vertical spread when splitting"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>splitSpread</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1.5f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Horizontal offset for split enemies"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>splitHorizontalOffset</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0.5f</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Split Limits"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Current generation (0 = original, increases with each split)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>int</color> <color=#B48EAD>generation</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Maximum generations allowed (prevents infinite splitting)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>int</color> <color=#B48EAD>maxGenerations</color> <color=#D4D4D4>=</color> <color=#B5CEA8>2</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Visual Feedback"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Color tint based on generation"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>Color</color><color=#D4D4D4>[</color><color=#D4D4D4>]</color> <color=#B48EAD>generationColors</color> <color=#D4D4D4>=</color> <color=#569CD6>new</color> <color=#4EC9B0>Color</color><color=#D4D4D4>[</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>{</color>
+        <color=#4EC9B0>Color</color><color=#D4D4D4>.</color>white<color=#D4D4D4>,</color>
+        <color=#569CD6>new</color> <color=#4EC9B0>Color</color><color=#D4D4D4>(</color><color=#B5CEA8>0.8f</color><color=#D4D4D4>,</color> <color=#B5CEA8>1f</color><color=#D4D4D4>,</color> <color=#B5CEA8>0.8f</color><color=#D4D4D4>,</color> <color=#B5CEA8>1f</color><color=#D4D4D4>)</color><color=#D4D4D4>,</color>
+        <color=#569CD6>new</color> <color=#4EC9B0>Color</color><color=#D4D4D4>(</color><color=#B5CEA8>0.6f</color><color=#D4D4D4>,</color> <color=#B5CEA8>1f</color><color=#D4D4D4>,</color> <color=#B5CEA8>0.6f</color><color=#D4D4D4>,</color> <color=#B5CEA8>1f</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>}</color><color=#D4D4D4>;</color>
+
+    <color=#569CD6>public</color> <color=#569CD6>override</color> EnemyType <color=#FFA500>GetEnemyType</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color> => EnemyType<color=#D4D4D4>.</color>Split<color=#D4D4D4>;</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>override</color> <color=#569CD6>void</color> <color=#FFA500>Start</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#569CD6>base</color><color=#D4D4D4>.</color><color=#FFA500>Start</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        <color=#FFA500>ApplyGenerationVisuals</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>override</color> <color=#569CD6>void</color> <color=#FFA500>ExecuteBehavior</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#57A64A>// Simple left movement</color>
+        transform<color=#D4D4D4>.</color><color=#FFA500>Translate</color><color=#D4D4D4>(</color><color=#4EC9B0>Vector3</color><color=#D4D4D4>.</color>left <color=#D4D4D4>*</color> moveSpeed <color=#D4D4D4>*</color> <color=#4EC9B0>Time</color><color=#D4D4D4>.</color>deltaTime<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>override</color> <color=#569CD6>void</color> <color=#FFA500>OnHitBird</color><color=#D4D4D4>(</color>Bird bird<color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#57A64A>// Deal damage first</color>
+        <color=#569CD6>for</color> <color=#D4D4D4>(</color><color=#4EC9B0>int</color> i <color=#D4D4D4>=</color> <color=#B5CEA8>0</color>; i < damage; i++)
+        {
+            bird.GetHit();
+        }
+
+        // Then split (if allowed)
+        if (generation < maxGenerations)
+        {
+            Split();
+        }
+
+        DestroySelf();
+    }
+
+    public override void Kill()
+    {
+        if (!isActive) return;
+
+        isActive = false;
+
+        // Split when killed (if allowed)
+        if (generation < maxGenerations)
+        {
+            Split();
+        }
+
+        OnEnemyKilled?.Invoke(this);
+        DestroySelf();
+    }
+
+    private void Split()
+    {
+        // Calculate spawn positions
+        float angleStep = 180f / (splitCount + 1);
+        
+        for (int i = 0; i < splitCount; i++)
+        {
+            // Calculate spread position
+            float angle = angleStep * (i + 1);
+            float yOffset = Mathf.Sin(angle * Mathf.Deg2Rad) * splitSpread;
+            
+            // Alternate above and below
+            if (i % 2 == 0)
+                yOffset = splitSpread * 0.5f * (i + 1) / splitCount;
+            else
+                yOffset = -splitSpread * 0.5f * (i + 1) / splitCount;
+
+            Vector3 spawnPos = transform.position + new Vector3(splitHorizontalOffset, yOffset, 0f);
+
+            // Spawn the split enemy
+            GameObject splitEnemy = SpawnSplitEnemy(spawnPos);
+            
+            if (splitEnemy != null)
+            {
+                ConfigureSplitEnemy(splitEnemy);
+            }
+        }
+    }
+
+    private GameObject SpawnSplitEnemy(Vector3 position)
+    {
+        GameObject prefabToSpawn = splitPrefab != null ? splitPrefab : gameObject;
+        
+        // If using self as prefab, we need to instantiate before destroying
+        if (splitPrefab == null)
+        {
+            // Create a copy with the same setup
+            GameObject copy = Instantiate(gameObject, position, Quaternion.identity);
+            return copy;
+        }
+        else
+        {
+            return Instantiate(splitPrefab, position, Quaternion.identity);
+        }
+    }
+
+    private void ConfigureSplitEnemy(GameObject enemyObj)
+    {
+        // Scale down
+        enemyObj.transform.localScale = transform.localScale * splitScaleMultiplier;
+
+        // Configure the enemy component
+        if (enemyObj.TryGetComponent<SplitEnemy>(out var splitEnemy))
+        {
+            splitEnemy.generation = this.generation + 1;
+            splitEnemy.moveSpeed = this.moveSpeed * splitSpeedMultiplier;
+            splitEnemy.birdTransform = this.birdTransform;
+            splitEnemy.destroyX = this.destroyX;
+            splitEnemy.maxGenerations = this.maxGenerations;
+            splitEnemy.splitPrefab = this.splitPrefab;
+            splitEnemy.splitCount = this.splitCount;
+            splitEnemy.splitScaleMultiplier = this.splitScaleMultiplier;
+            splitEnemy.splitSpeedMultiplier = this.splitSpeedMultiplier;
+            splitEnemy.ApplyGenerationVisuals();
+        }
+        else if (enemyObj.TryGetComponent<BaseEnemy>(out var baseEnemy))
+        {
+            // If split prefab is a different enemy type
+            baseEnemy.Initialize(moveSpeed * splitSpeedMultiplier, birdTransform, destroyX);
+        }
+    }
+
+    private void ApplyGenerationVisuals()
+    {
+        if (spriteRenderer != null && generation < generationColors.Length)
+        {
+            spriteRenderer.color = generationColors[generation];
+        }
+    }
+
+    /// <summary>
+    /// Set the generation level
+    /// </summary>
+    public void SetGeneration(int gen)
+    {
+        generation = gen;
+        ApplyGenerationVisuals();
+    }
+
+    /// <summary>
+    /// Get current generation
+    /// </summary>
+    public int GetGeneration()
+    {
+        return generation;
+    }
+
+    /// <summary>
+    /// Check if this enemy can still split
+    /// </summary>
+    public bool CanSplit()
+    {
+        return generation < maxGenerations;
+    }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        
+        // Show split positions
+        float angleStep = 180f / (splitCount + 1);
+        for (int i = 0; i < splitCount; i++)
+        {
+            float yOffset = (i % 2 == 0) 
+                ? splitSpread * 0.5f * (i + 1) / splitCount 
+                : -splitSpread * 0.5f * (i + 1) / splitCount;
+            
+            Vector3 pos = transform.position + new Vector3(splitHorizontalOffset, yOffset, 0f);
+            Gizmos.DrawWireSphere(pos, 0.3f);
+        }
+    }
+#endif
+}

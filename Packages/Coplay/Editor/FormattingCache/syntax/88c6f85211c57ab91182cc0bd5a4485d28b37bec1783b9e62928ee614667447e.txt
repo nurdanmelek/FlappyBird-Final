@@ -1,0 +1,20 @@
+------<color=#D4D4D4>-</color> ORIGINAL
+<color=#D4D4D4></color>    <color=#569CD6>private</color> <color=#569CD6>void</color> OnTriggerEnter2D<color=#D4D4D4>(</color>Collider2D collision<color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color>_isGameEnded<color=#D4D4D4>)</color> <color=#569CD6>return</color><color=#D4D4D4>;</color>
+
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color>collision<color=#D4D4D4>.</color><color=#FFA500>CompareTag</color><color=#D4D4D4>(</color><color=#FF69B4>"Pipe"</color><color=#D4D4D4>)</color><color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            <color=#FFA500>GetHit</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        <color=#D4D4D4>}</color>
+<color=#D4D4D4></color>=======
+<color=#9B9B9B>    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (_isGameEnded) return;
+
+        if (collision.CompareTag("Pipe") || collision.CompareTag("Enemy"))
+        {
+            GetHit();
+        }
++++++++ NEW
+</color>

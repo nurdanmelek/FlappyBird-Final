@@ -1,0 +1,10 @@
+<color=#569CD6>using</color> UnityEngine<color=#D4D4D4>;</color>
+<color=#569CD6>using</color> UnityEditor<color=#D4D4D4>;</color>
+
+<color=#569CD6>public</color> <color=#569CD6>class</color> <color=#FFA500>SetupEnemySystemRunner</color>
+<color=#D4D4D4>{</color>
+    <color=#569CD6>public</color> <color=#569CD6>static</color> <color=#569CD6>void</color> <color=#FFA500>Execute</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        SetupEnemySystem<color=#D4D4D4>.</color><color=#FFA500>Execute</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+    <color=#D4D4D4>}</color>
+<color=#D4D4D4>}</color>

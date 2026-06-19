@@ -1,0 +1,1 @@
+Şimdi RestartLevel metoduna enemy sistemini ekleyeceğim ve GameDirector'a enemyManager referansını atayacağım.

@@ -1,0 +1,57 @@
+------<color=#D4D4D4>-</color> ORIGINAL
+<color=#D4D4D4></color>    <color=#569CD6>public</color> <color=#569CD6>void</color> RestartLevel<color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        
+
+        obstacleSpawner<color=#D4D4D4>.</color><color=#FFA500>Init</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color> <color=#57A64A>// sadece ba��ml�l�klar� haz�rla (kamera vs)</color>
+        obstacleManager<color=#D4D4D4>.</color><color=#FFA500>Init</color><color=#D4D4D4>(</color>obstacleSpawner<color=#D4D4D4>,</color> <color=#FFA500>GetPipeSpeed</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>,</color> <color=#FFA500>GetSpawnDistance</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>,</color> _destroyX<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+        obstacleManager<color=#D4D4D4>.</color><color=#FFA500>ResetAll</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        obstacleManager<color=#D4D4D4>.</color><color=#FFA500>StartRun</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+        gateManager<color=#D4D4D4>.</color><color=#FFA500>SetSpawnInterval</color><color=#D4D4D4>(</color><color=#B5CEA8>7f</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        gateManager<color=#D4D4D4>.</color><color=#FFA500>RestartGateManager</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+        bird<color=#D4D4D4>.</color><color=#FFA500>RestartBird</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        coinManager<color=#D4D4D4>.</color><color=#FFA500>StartCoinSpawnCoroutine</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        
+        obstacleManager<color=#D4D4D4>.</color><color=#FFA500>StartRun</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+        audioManager<color=#D4D4D4>.</color><color=#FFA500>StartMusic</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        uIManager<color=#D4D4D4>.</color><color=#FFA500>ShowInGameUI</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        uIManager<color=#D4D4D4>.</color>tapUI<color=#D4D4D4>.</color><color=#FFA500>Show</color><color=#D4D4D4>(</color>currentLevel<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>}</color>
+=======
+<color=#9B9B9B>    public void RestartLevel()
+    {
+        
+
+        obstacleSpawner.Init(); // sadece bağımlılıkları hazırla (kamera vs)
+        obstacleManager.Init(obstacleSpawner, GetPipeSpeed(), GetSpawnDistance(), _destroyX);
+
+        obstacleManager.ResetAll();
+        obstacleManager.StartRun();
+
+        gateManager.SetSpawnInterval(7f);
+        gateManager.RestartGateManager();
+
+        bird.RestartBird();
+        coinManager.StartCoinSpawnCoroutine();
+        
+        obstacleManager.StartRun();
+        
+        // Start enemy system
+        if (enemyManager != null)
+        {
+            enemyManager.SetLevel(currentLevel);
+            enemyManager.StartEnemySystem();
+        }
+
+        audioManager.StartMusic();
+        uIManager.ShowInGameUI();
+        uIManager.tapUI.Show(currentLevel);
+
+    }
++++++++ NEW
+</color>

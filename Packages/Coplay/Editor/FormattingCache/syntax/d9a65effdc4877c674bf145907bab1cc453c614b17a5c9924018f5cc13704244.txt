@@ -1,0 +1,219 @@
+<color=#569CD6>using</color> UnityEngine<color=#D4D4D4>;</color>
+
+/// <summary>
+/// Enemy that moves in a sinusoidal/circular pattern while traveling left.
+/// Creates unpredictable movement that's harder to avoid.
+/// </summary>
+<color=#569CD6>public</color> <color=#569CD6>class</color> <color=#FFA500>RotateEnemy</color> <color=#D4D4D4>:</color> BaseEnemy
+<color=#D4D4D4>{</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Movement Pattern"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Type of movement pattern"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>MovementPattern</color> <color=#B48EAD>pattern</color> <color=#D4D4D4>=</color> <color=#4EC9B0>MovementPattern</color><color=#D4D4D4>.</color><color=#B48EAD>Sine</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Amplitude of the wave/circle movement"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>amplitude</color> <color=#D4D4D4>=</color> <color=#B5CEA8>2f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Frequency of the wave/rotation"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>frequency</color> <color=#D4D4D4>=</color> <color=#B5CEA8>2f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Phase offset for variation between enemies"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>phaseOffset</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0f</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Rotation Visual"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Rotate the sprite to match movement direction"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#569CD6>bool</color> <color=#B48EAD>rotateSprite</color> <color=#D4D4D4>=</color> <color=#569CD6>true</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Additional constant rotation speed"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>constantRotationSpeed</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0f</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Randomization"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Randomize phase on start"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#569CD6>bool</color> <color=#B48EAD>randomizePhase</color> <color=#D4D4D4>=</color> <color=#569CD6>true</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Randomize amplitude slightly"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#569CD6>bool</color> <color=#B48EAD>randomizeAmplitude</color> <color=#D4D4D4>=</color> <color=#569CD6>false</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Amplitude variation range"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>amplitudeVariation</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0.5f</color><color=#D4D4D4>;</color>
+
+    <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>startY</color><color=#D4D4D4>;</color>
+    <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>timeOffset</color><color=#D4D4D4>;</color>
+    <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>actualAmplitude</color><color=#D4D4D4>;</color>
+    <color=#569CD6>private</color> <color=#4EC9B0>Vector3</color> <color=#B48EAD>lastPosition</color><color=#D4D4D4>;</color>
+
+    <color=#569CD6>public</color> <color=#569CD6>enum</color> <color=#FFA500>MovementPattern</color>
+    <color=#D4D4D4>{</color>
+        Sine<color=#D4D4D4>,</color>           <color=#57A64A>// Up and down sine wave</color>
+        Cosine<color=#D4D4D4>,</color>         <color=#57A64A>// Cosine wave (starts at peak)</color>
+        Circle<color=#D4D4D4>,</color>         <color=#57A64A>// Circular motion</color>
+        Figure8<color=#D4D4D4>,</color>        <color=#57A64A>// Figure-8 pattern</color>
+        Zigzag          <color=#57A64A>// Sharp zigzag pattern</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#569CD6>public</color> <color=#569CD6>override</color> EnemyType <color=#FFA500>GetEnemyType</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color> => EnemyType<color=#D4D4D4>.</color>Rotate<color=#D4D4D4>;</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>override</color> <color=#569CD6>void</color> <color=#FFA500>Start</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#569CD6>base</color><color=#D4D4D4>.</color><color=#FFA500>Start</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        
+        <color=#B48EAD>startY</color> <color=#D4D4D4>=</color> transform<color=#D4D4D4>.</color>position<color=#D4D4D4>.</color>y<color=#D4D4D4>;</color>
+        <color=#B48EAD>lastPosition</color> <color=#D4D4D4>=</color> transform<color=#D4D4D4>.</color>position<color=#D4D4D4>;</color>
+        
+        <color=#57A64A>// Apply randomization</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#B48EAD>randomizePhase</color><color=#D4D4D4>)</color>
+            <color=#B48EAD>phaseOffset</color> <color=#D4D4D4>=</color> <color=#4EC9B0>Random</color><color=#D4D4D4>.</color><color=#FFA500>Range</color><color=#D4D4D4>(</color><color=#B5CEA8>0f</color><color=#D4D4D4>,</color> <color=#4EC9B0>Mathf</color><color=#D4D4D4>.</color><color=#B48EAD>PI</color> <color=#D4D4D4>*</color> <color=#B5CEA8>2f</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        
+        <color=#B48EAD>actualAmplitude</color> <color=#D4D4D4>=</color> <color=#B48EAD>amplitude</color><color=#D4D4D4>;</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#B48EAD>randomizeAmplitude</color><color=#D4D4D4>)</color>
+            actualAmplitude = amplitude + Random.Range(-amplitudeVariation, amplitudeVariation);
+        
+        timeOffset = Time.time;
+    }
+
+    protected override void ExecuteBehavior()
+    {
+        float elapsed = Time.time - timeOffset;
+        float t = elapsed * frequency + phaseOffset;
+
+        // Calculate new position based on pattern
+        Vector3 newPosition = CalculatePosition(t);
+        
+        // Apply constant rotation if enabled
+        if (constantRotationSpeed != 0f)
+        {
+            transform.Rotate(0f, 0f, constantRotationSpeed * Time.deltaTime);
+        }
+        
+        // Rotate sprite to face movement direction
+        if (rotateSprite && spriteRenderer != null)
+        {
+            Vector3 direction = newPosition - lastPosition;
+            if (direction.sqrMagnitude > 0.0001f)
+            {
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                spriteRenderer.transform.rotation = Quaternion.Euler(0f, 0f, angle);
+            }
+        }
+
+        lastPosition = transform.position;
+        transform.position = newPosition;
+    }
+
+    private Vector3 CalculatePosition(float t)
+    {
+        float x = transform.position.x - moveSpeed * Time.deltaTime;
+        float y = startY;
+
+        switch (pattern)
+        {
+            case MovementPattern.Sine:
+                y = startY + Mathf.Sin(t) * actualAmplitude;
+                break;
+
+            case MovementPattern.Cosine:
+                y = startY + Mathf.Cos(t) * actualAmplitude;
+                break;
+
+            case MovementPattern.Circle:
+                // Circular motion - both X and Y affected
+                float circleX = Mathf.Cos(t) * actualAmplitude * 0.5f;
+                x = transform.position.x - moveSpeed * Time.deltaTime + circleX * Time.deltaTime * frequency;
+                y = startY + Mathf.Sin(t) * actualAmplitude;
+                break;
+
+            case MovementPattern.Figure8:
+                // Figure-8 (Lissajous curve)
+                y = startY + Mathf.Sin(t) * actualAmplitude;
+                float figure8X = Mathf.Sin(t * 2f) * actualAmplitude * 0.3f;
+                x = transform.position.x - moveSpeed * Time.deltaTime + figure8X * Time.deltaTime;
+                break;
+
+            case MovementPattern.Zigzag:
+                // Sharp zigzag using triangle wave
+                float triangleWave = Mathf.Abs((t % (Mathf.PI * 2f)) / Mathf.PI - 1f) * 2f - 1f;
+                y = startY + triangleWave * actualAmplitude;
+                break;
+        }
+
+        return new Vector3(x, y, transform.position.z);
+    }
+
+    /// <summary>
+    /// Set the movement pattern at runtime
+    /// </summary>
+    public void SetPattern(MovementPattern newPattern)
+    {
+        pattern = newPattern;
+    }
+
+    /// <summary>
+    /// Set amplitude at runtime
+    /// </summary>
+    public void SetAmplitude(float newAmplitude)
+    {
+        amplitude = newAmplitude;
+        actualAmplitude = newAmplitude;
+    }
+
+    /// <summary>
+    /// Set frequency at runtime
+    /// </summary>
+    public void SetFrequency(float newFrequency)
+    {
+        frequency = newFrequency;
+    }
+
+    /// <summary>
+    /// Get current movement pattern
+    /// </summary>
+    public MovementPattern GetPattern()
+    {
+        return pattern;
+    }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        
+        // Preview the movement path
+        Vector3 previewStart = Application.isPlaying ? new Vector3(transform.position.x, startY, 0f) : transform.position;
+        Vector3 lastPos = previewStart;
+        
+        float previewAmplitude = Application.isPlaying ? actualAmplitude : amplitude;
+        
+        for (int i = 1; i <= 50; i++)
+        {
+            float t = i * 0.2f + phaseOffset;
+            float y = 0f;
+            float xOffset = 0f;
+
+            switch (pattern)
+            {
+                case MovementPattern.Sine:
+                    y = Mathf.Sin(t) * previewAmplitude;
+                    break;
+                case MovementPattern.Cosine:
+                    y = Mathf.Cos(t) * previewAmplitude;
+                    break;
+                case MovementPattern.Circle:
+                    y = Mathf.Sin(t) * previewAmplitude;
+                    xOffset = Mathf.Cos(t) * previewAmplitude * 0.3f;
+                    break;
+                case MovementPattern.Figure8:
+                    y = Mathf.Sin(t) * previewAmplitude;
+                    xOffset = Mathf.Sin(t * 2f) * previewAmplitude * 0.3f;
+                    break;
+                case MovementPattern.Zigzag:
+                    float triangleWave = Mathf.Abs((t % (Mathf.PI * 2f)) / Mathf.PI - 1f) * 2f - 1f;
+                    y = triangleWave * previewAmplitude;
+                    break;
+            }
+
+            Vector3 pos = previewStart + new Vector3(-i * 0.3f + xOffset, y, 0f);
+            Gizmos.DrawLine(lastPos, pos);
+            lastPos = pos;
+        }
+    }
+#endif
+}

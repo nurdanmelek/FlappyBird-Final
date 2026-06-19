@@ -1,0 +1,6 @@
+Enemy sistemi tamamlandı. İşte oluşturduğum modüler enemy sisteminin özeti:
+
+<size=20>📁 Oluşturulan Dosyalar</size>
+
+<size=18>Scripts (Assets/Scripts/Enemies/)</size>
+|

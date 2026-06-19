@@ -1,0 +1,1 @@
+Şimdi GameDirector'a enemyManager referansını atayacağım.

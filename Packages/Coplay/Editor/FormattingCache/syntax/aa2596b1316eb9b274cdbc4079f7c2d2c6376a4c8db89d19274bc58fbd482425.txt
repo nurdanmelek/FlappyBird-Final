@@ -1,0 +1,17 @@
+<color=#569CD6>using</color> UnityEngine<color=#D4D4D4>;</color>
+
+/// <summary>
+/// Abstract base class for all enemy types.
+/// Provides common functionality and defines the contract for enemy behaviors.
+/// </summary>
+<color=#569CD6>public</color> <color=#569CD6>abstract</color> <color=#569CD6>class</color> <color=#FFA500>BaseEnemy</color> <color=#D4D4D4>:</color> <color=#4EC9B0>MonoBehaviour</color>
+<color=#D4D4D4>{</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Base Enemy Settings"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Base movement speed of the enemy"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>protected</color> <color=#4EC9B0>float</color> <color=#B48EAD>moveSpeed</color> <color=#D4D4D4>=</color> <color=#B5CEA8>3f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Damage dealt to the bird on collision"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>protected</color> <color=#4EC9B0>int</color> <color=#B48EAD>damage</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Reference to the bird transform (auto-assigned if null)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>protected</color> <color=#4EC9B0>Transform</color> <color=#B48EAD>birdTransf</color><color=#D4D4D4></color>

@@ -1,0 +1,1 @@
+EnemyManager'da <color=#4EC9B0>StopAndClearAll</color> metodu yok, <color=#4EC9B0>ResetEnemySystem</color> var. GameDirector'daki

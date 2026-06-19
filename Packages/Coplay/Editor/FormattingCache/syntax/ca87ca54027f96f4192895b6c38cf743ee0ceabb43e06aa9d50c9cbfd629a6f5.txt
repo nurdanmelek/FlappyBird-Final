@@ -1,0 +1,28 @@
+------<color=#D4D4D4>-</color> ORIGINAL
+<color=#D4D4D4></color>    <color=#57A64A>// GameOver / Restart gibi eventlerde:</color>
+    <color=#569CD6>public</color> <color=#569CD6>void</color> LevelFailed<color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        gateManager<color=#D4D4D4>.</color><color=#FFA500>StopGateManager</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        obstacleManager<color=#D4D4D4>.</color><color=#FFA500>StopRun</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        coinManager<color=#D4D4D4>.</color><color=#FFA500>StopCoinSpawnCoroutine</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        audioManager<color=#D4D4D4>.</color><color=#FFA500>StopMusic</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+        uIManager<color=#D4D4D4>.</color><color=#FFA500>LevelFailed</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+    <color=#D4D4D4>}</color>
+=======
+<color=#9B9B9B>    // GameOver / Restart gibi eventlerde:
+    public void LevelFailed()
+    {
+        gateManager.StopGateManager();
+        obstacleManager.StopRun();
+        coinManager.StopCoinSpawnCoroutine();
+        audioManager.StopMusic();
+        
+        // Stop enemy system
+        if (enemyManager != null)
+            enemyManager.StopAndClearAll();
+
+        uIManager.LevelFailed();
+    }
++++++++ NEW
+</color>

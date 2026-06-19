@@ -1,0 +1,12 @@
+Enemy sistemi tamamlandı. İşte oluşturduğum modüler enemy sisteminin özeti:
+
+<size=20>📁 Oluşturulan Dosyalar</size>
+
+<size=18>Scripts (Assets/Scripts/Enemies/)</size>
+| Dosya | Açıklama |
+|-------|----------|
+| <color=#4EC9B0>BaseEnemy.cs</color> | Abstract base class - tüm enemy'ler için ortak fonksiyonlar |
+| <color=#4EC9B0>NormalEnemy.cs</color> | Sadece sola hareket eden basit enemy |
+| <color=#4EC9B0>FollowEnemy.cs</color> | Belirli mesafede kuşu yumuşak takip eden enemy |
+| <color=#4EC9B0>ExplodeEnemy.cs</color> | Yaklaştıkça büyüyen ve ekstra hasar veren enemy |
+| <color=#4EC9B0>SplitEnemy.cs</color> |

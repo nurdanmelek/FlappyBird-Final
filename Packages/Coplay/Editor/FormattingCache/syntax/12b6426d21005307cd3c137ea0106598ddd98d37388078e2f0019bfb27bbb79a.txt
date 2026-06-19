@@ -1,0 +1,159 @@
+<color=#569CD6>using</color> UnityEngine<color=#D4D4D4>;</color>
+
+/// <summary>
+/// Enemy that grows in size when approaching the bird and deals extra damage on collision.
+/// Creates tension as the player sees the enemy getting bigger and more threatening.
+/// </summary>
+<color=#569CD6>public</color> <color=#569CD6>class</color> <color=#FFA500>ExplodeEnemy</color> <color=#D4D4D4>:</color> BaseEnemy
+<color=#D4D4D4>{</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Explode Settings"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Distance at which the enemy starts growing"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>growStartDistance</color> <color=#D4D4D4>=</color> <color=#B5CEA8>6f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Maximum scale multiplier when fully grown"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>maxScaleMultiplier</color> <color=#D4D4D4>=</color> <color=#B5CEA8>2f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"How fast the enemy grows"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>growSpeed</color> <color=#D4D4D4>=</color> <color=#B5CEA8>2f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Extra damage dealt when exploding (added to base damage)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>int</color> <color=#B48EAD>explosionBonusDamage</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Visual Feedback"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Color to tint when growing"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>Color</color> <color=#B48EAD>growColor</color> <color=#D4D4D4>=</color> <color=#569CD6>new</color> <color=#4EC9B0>Color</color><color=#D4D4D4>(</color><color=#B5CEA8>1f</color><color=#D4D4D4>,</color> <color=#B5CEA8>0.5f</color><color=#D4D4D4>,</color> <color=#B5CEA8>0.5f</color><color=#D4D4D4>,</color> <color=#B5CEA8>1f</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Enable pulsing effect when fully grown"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#569CD6>bool</color> <color=#B48EAD>enablePulse</color> <color=#D4D4D4>=</color> <color=#569CD6>true</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Pulse speed when fully grown"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>pulseSpeed</color> <color=#D4D4D4>=</color> <color=#B5CEA8>5f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Pulse intensity (scale variation)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>pulseIntensity</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0.1f</color><color=#D4D4D4>;</color>
+
+    <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>currentScaleMultiplier</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1f</color><color=#D4D4D4>;</color>
+    <color=#569CD6>private</color> <color=#4EC9B0>Color</color> <color=#B48EAD>originalColor</color><color=#D4D4D4>;</color>
+    <color=#569CD6>private</color> <color=#569CD6>bool</color> <color=#B48EAD>isGrowing</color> <color=#D4D4D4>=</color> <color=#569CD6>false</color><color=#D4D4D4>;</color>
+    <color=#569CD6>private</color> <color=#569CD6>bool</color> <color=#B48EAD>isFullyGrown</color> <color=#D4D4D4>=</color> <color=#569CD6>false</color><color=#D4D4D4>;</color>
+
+    <color=#569CD6>public</color> <color=#569CD6>override</color> EnemyType <color=#FFA500>GetEnemyType</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color> => EnemyType<color=#D4D4D4>.</color>Explode<color=#D4D4D4>;</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>override</color> <color=#569CD6>void</color> <color=#FFA500>Awake</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#569CD6>base</color><color=#D4D4D4>.</color><color=#FFA500>Awake</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color>spriteRenderer != <color=#569CD6>null</color><color=#D4D4D4>)</color>
+            <color=#B48EAD>originalColor</color> <color=#D4D4D4>=</color> spriteRenderer<color=#D4D4D4>.</color>color<color=#D4D4D4>;</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>override</color> <color=#569CD6>void</color> <color=#FFA500>ExecuteBehavior</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#57A64A>// Base left movement</color>
+        transform<color=#D4D4D4>.</color><color=#FFA500>Translate</color><color=#D4D4D4>(</color><color=#4EC9B0>Vector3</color><color=#D4D4D4>.</color>left <color=#D4D4D4>*</color> moveSpeed <color=#D4D4D4>*</color> <color=#4EC9B0>Time</color><color=#D4D4D4>.</color>deltaTime<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+        <color=#57A64A>// Handle growth based on distance to bird</color>
+        <color=#FFA500>UpdateGrowth</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#569CD6>private</color> <color=#569CD6>void</color> <color=#FFA500>UpdateGrowth</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#4EC9B0>float</color> distanceToBird <color=#D4D4D4>=</color> <color=#FFA500>GetDistanceToBird</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color>distanceToBird <= <color=#B48EAD>growStartDistance</color> && birdTransform != <color=#569CD6>null</color><color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            <color=#B48EAD>isGrowing</color> <color=#D4D4D4>=</color> <color=#569CD6>true</color><color=#D4D4D4>;</color>
+
+            <color=#57A64A>// Calculate target scale based on distance (closer = bigger)</color>
+            <color=#4EC9B0>float</color> distanceRatio = 1f - (distanceToBird / growStartDistance);
+            float targetMultiplier = 1f + (maxScaleMultiplier - 1f) * distanceRatio;
+
+            // Smoothly interpolate to target scale
+            currentScaleMultiplier = Mathf.Lerp(currentScaleMultiplier, targetMultiplier, growSpeed * Time.deltaTime);
+
+            // Check if fully grown
+            isFullyGrown = currentScaleMultiplier >= maxScaleMultiplier * 0.95f;
+
+            // Apply scale with optional pulse
+            float finalMultiplier = currentScaleMultiplier;
+            if (isFullyGrown && enablePulse)
+            {
+                finalMultiplier += Mathf.Sin(Time.time * pulseSpeed) * pulseIntensity;
+            }
+
+            transform.localScale = initialScale * finalMultiplier;
+
+            // Update color based on growth
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = Color.Lerp(originalColor, growColor, distanceRatio);
+            }
+        }
+        else if (isGrowing)
+        {
+            // Shrink back when bird moves away
+            currentScaleMultiplier = Mathf.Lerp(currentScaleMultiplier, 1f, growSpeed * 0.5f * Time.deltaTime);
+            transform.localScale = initialScale * currentScaleMultiplier;
+
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = Color.Lerp(spriteRenderer.color, originalColor, growSpeed * 0.5f * Time.deltaTime);
+            }
+
+            // Reset growing state when back to normal
+            if (currentScaleMultiplier <= 1.05f)
+            {
+                isGrowing = false;
+                isFullyGrown = false;
+                currentScaleMultiplier = 1f;
+                transform.localScale = initialScale;
+                
+                if (spriteRenderer != null)
+                    spriteRenderer.color = originalColor;
+            }
+        }
+    }
+
+    protected override void OnHitBird(Bird bird)
+    {
+        // Calculate total damage (base + bonus if grown)
+        int totalDamage = damage;
+        
+        if (isGrowing && currentScaleMultiplier > 1.2f)
+        {
+            totalDamage += explosionBonusDamage;
+        }
+
+        // Deal damage
+        for (int i = 0; i < totalDamage; i++)
+        {
+            bird.GetHit();
+        }
+
+        DestroySelf();
+    }
+
+    /// <summary>
+    /// Check if enemy is currently in growing state
+    /// </summary>
+    public bool IsGrowing()
+    {
+        return isGrowing;
+    }
+
+    /// <summary>
+    /// Get current scale multiplier
+    /// </summary>
+    public float GetCurrentScaleMultiplier()
+    {
+        return currentScaleMultiplier;
+    }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, growStartDistance);
+    }
+#endif
+}

@@ -1,0 +1,57 @@
+------<color=#D4D4D4>-</color> ORIGINAL
+<color=#D4D4D4></color><color=#569CD6>public</color> <color=#569CD6>class</color> <color=#FFA500>GameDirector</color> <color=#D4D4D4>:</color> MonoBehaviour
+<color=#D4D4D4>{</color>
+   
+    <color=#569CD6>public</color> AudioManager <color=#B48EAD>audioManager</color><color=#D4D4D4>;</color>
+    
+    <color=#569CD6>public</color> CoinManager <color=#B48EAD>coinManager</color><color=#D4D4D4>;</color>
+
+    <color=#569CD6>public</color> GateManager <color=#B48EAD>gateManager</color><color=#D4D4D4>;</color>
+
+    <color=#569CD6>public</color> FXManager <color=#B48EAD>fXManager</color><color=#D4D4D4>;</color>
+    
+    <color=#569CD6>public</color> MainMenu <color=#B48EAD>mainMenu</color><color=#D4D4D4>;</color>
+    
+    <color=#569CD6>public</color> UIManager <color=#B48EAD>uIManager</color><color=#D4D4D4>;</color>
+    
+    <color=#569CD6>public</color> WordsManager <color=#B48EAD>wordsManager</color><color=#D4D4D4>;</color>
+    
+    <color=#569CD6>public</color> LevelManager <color=#B48EAD>levelManager</color><color=#D4D4D4>;</color>
+
+    <color=#569CD6>public</color> <color=#4EC9B0>int</color> <color=#B48EAD>currentLevel</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1</color><color=#D4D4D4>;</color>
+
+    <color=#57A64A>/*public IncrementalManager incrementalManager;*/</color>
+
+    <color=#569CD6>public</color> ObstacleManager <color=#B48EAD>obstacleManager</color><color=#D4D4D4>;</color>
+    <color=#569CD6>public</color> Bird <color=#B48EAD>bird</color><color=#D4D4D4>;</color>
+<color=#D4D4D4></color>=======
+<color=#9B9B9B>public class GameDirector : MonoBehaviour
+{
+   
+    public AudioManager audioManager;
+    
+    public CoinManager coinManager;
+
+    public GateManager gateManager;
+
+    public FXManager fXManager;
+    
+    public MainMenu mainMenu;
+    
+    public UIManager uIManager;
+    
+    public WordsManager wordsManager;
+    
+    public LevelManager levelManager;
+
+    public int currentLevel = 1;
+
+    /*public IncrementalManager incrementalManager;*/
+
+    public ObstacleManager obstacleManager;
+    public Bird bird;
+    
+    [Header("Enemy System")]
+    public EnemyManager enemyManager;
++++++++ NEW
+</color>

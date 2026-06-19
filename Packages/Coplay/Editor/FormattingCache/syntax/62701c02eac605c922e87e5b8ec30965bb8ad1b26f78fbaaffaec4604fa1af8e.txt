@@ -1,0 +1,39 @@
+<color=#569CD6>using</color> UnityEngine<color=#D4D4D4>;</color>
+<color=#569CD6>using</color> UnityEditor<color=#D4D4D4>;</color>
+
+<color=#569CD6>public</color> <color=#569CD6>class</color> <color=#FFA500>SetupEnemyTags</color>
+<color=#D4D4D4>{</color>
+    <color=#569CD6>public</color> <color=#569CD6>static</color> <color=#569CD6>void</color> <color=#FFA500>Execute</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#57A64A>// Add Enemy tag if it doesn't exist</color>
+        SerializedObject tagManager <color=#D4D4D4>=</color> <color=#569CD6>new</color> SerializedObject<color=#D4D4D4>(</color>AssetDatabase<color=#D4D4D4>.</color><color=#FFA500>LoadAllAssetsAtPath</color><color=#D4D4D4>(</color><color=#FF69B4>"ProjectSettings/TagManager.asset"</color><color=#D4D4D4>)</color><color=#D4D4D4>[</color><color=#B5CEA8>0</color><color=#D4D4D4>]</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        SerializedProperty tagsProp <color=#D4D4D4>=</color> tagManager<color=#D4D4D4>.</color><color=#FFA500>FindProperty</color><color=#D4D4D4>(</color><color=#FF69B4>"tags"</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        
+        <color=#569CD6>bool</color> enemyTagExists <color=#D4D4D4>=</color> <color=#569CD6>false</color><color=#D4D4D4>;</color>
+        <color=#569CD6>for</color> <color=#D4D4D4>(</color><color=#4EC9B0>int</color> i <color=#D4D4D4>=</color> <color=#B5CEA8>0</color><color=#D4D4D4>;</color> i <color=#D4D4D4><</color> tagsProp<color=#D4D4D4>.</color>arraySize<color=#D4D4D4>;</color> i++<color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            <color=#569CD6>if</color> <color=#D4D4D4>(</color>tagsProp<color=#D4D4D4>.</color><color=#FFA500>GetArrayElementAtIndex</color><color=#D4D4D4>(</color>i<color=#D4D4D4>)</color><color=#D4D4D4>.</color>stringValue == <color=#FF69B4>"Enemy"</color><color=#D4D4D4>)</color>
+            <color=#D4D4D4>{</color>
+                enemyTagExists <color=#D4D4D4>=</color> <color=#569CD6>true</color><color=#D4D4D4>;</color>
+                <color=#569CD6>break</color><color=#D4D4D4>;</color>
+            <color=#D4D4D4>}</color>
+        <color=#D4D4D4>}</color>
+        
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#D4D4D4>!</color>enemyTagExists<color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            tagsProp<color=#D4D4D4>.</color><color=#FFA500>InsertArrayElementAtIndex</color><color=#D4D4D4>(</color>tagsProp<color=#D4D4D4>.</color>arraySize<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            tagsProp<color=#D4D4D4>.</color><color=#FFA500>GetArrayElementAtIndex</color><color=#D4D4D4>(</color>tagsProp<color=#D4D4D4>.</color>arraySize <color=#D4D4D4>-</color> <color=#B5CEA8>1</color><color=#D4D4D4>)</color><color=#D4D4D4>.</color>stringValue <color=#D4D4D4>=</color> <color=#FF69B4>"Enemy"</color><color=#D4D4D4>;</color>
+            tagManager<color=#D4D4D4>.</color><color=#FFA500>ApplyModifiedProperties</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            <color=#4EC9B0>Debug</color><color=#D4D4D4>.</color><color=#FFA500>Log</color><color=#D4D4D4>(</color><color=#FF69B4>"Added 'Enemy' tag to TagManager."</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        <color=#D4D4D4>}</color>
+        <color=#569CD6>else</color>
+        <color=#D4D4D4>{</color>
+            <color=#4EC9B0>Debug</color><color=#D4D4D4>.</color><color=#FFA500>Log</color><color=#D4D4D4>(</color><color=#FF69B4>"'Enemy' tag already exists."</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        <color=#D4D4D4>}</color>
+        
+        <color=#57A64A>// Set tag on all enemy prefabs</color>
+        <color=#4EC9B0>string</color><color=#D4D4D4>[</color><color=#D4D4D4>]</color> enemyPrefabPaths <color=#D4D4D4>=</color> <color=#569CD6>new</color> <color=#4EC9B0>string</color><color=#D4D4D4>[</color><color=#D4D4D4>]</color>
+        <color=#D4D4D4>{</color>
+            <color=#FF69B4>"Assets/Prefabs/Enemies/NormalEnemy.prefab"</color><color=#D4D4D4>,</color>
+            <color=#FF69B4>"Assets/Prefabs/Enemies/FollowEnemy.prefab"</color><color=#D4D4D4>,</color>
+            <color=#FF69B4>"Assets/Prefabs/Enemies/ExplodeEnemy.</color><color=#D4D4D4></color>

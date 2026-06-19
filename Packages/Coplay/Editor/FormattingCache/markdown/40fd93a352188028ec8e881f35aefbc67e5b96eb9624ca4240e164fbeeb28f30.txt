@@ -1,0 +1,1 @@
+Enemy sistemi başarıyla kuruldu. Şimdi Bird.cs'i güncelleyerek enemy collision'ı desteklemesini sağlayacağım.

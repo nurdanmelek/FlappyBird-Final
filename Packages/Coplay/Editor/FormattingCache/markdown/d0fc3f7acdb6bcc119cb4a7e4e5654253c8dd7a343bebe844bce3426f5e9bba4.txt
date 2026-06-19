@@ -1,0 +1,1 @@
+Şimdi enemy prefab'larını oluşturacağım. Mevcut bakteri sprite

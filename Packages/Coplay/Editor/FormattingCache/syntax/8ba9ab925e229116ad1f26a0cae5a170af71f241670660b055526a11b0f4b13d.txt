@@ -1,0 +1,100 @@
+<color=#569CD6>using</color> UnityEngine<color=#D4D4D4>;</color>
+
+/// <summary>
+/// Abstract base class for all enemy types.
+/// Provides common functionality and defines the contract for enemy behaviors.
+/// </summary>
+<color=#569CD6>public</color> <color=#569CD6>abstract</color> <color=#569CD6>class</color> <color=#FFA500>BaseEnemy</color> <color=#D4D4D4>:</color> <color=#4EC9B0>MonoBehaviour</color>
+<color=#D4D4D4>{</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Base Enemy Settings"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Base movement speed of the enemy"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>protected</color> <color=#4EC9B0>float</color> <color=#B48EAD>moveSpeed</color> <color=#D4D4D4>=</color> <color=#B5CEA8>3f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Damage dealt to the bird on collision"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>protected</color> <color=#4EC9B0>int</color> <color=#B48EAD>damage</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Reference to the bird transform (auto-assigned if null)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>protected</color> <color=#4EC9B0>Transform</color> <color=#B48EAD>birdTransform</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"X position at which the enemy is destroyed"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>protected</color> <color=#4EC9B0>float</color> <color=#B48EAD>destroyX</color> <color=#D4D4D4>=</color> <color=#D4D4D4>-</color><color=#B5CEA8>15f</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Visual Settings"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>protected</color> <color=#4EC9B0>SpriteRenderer</color> <color=#B48EAD>spriteRenderer</color><color=#D4D4D4>;</color>
+
+    <color=#57A64A>// Events for external systems</color>
+    <color=#569CD6>public</color> System<color=#D4D4D4>.</color>Action<color=#D4D4D4><</color><color=#4EC9B0>BaseEnemy</color><color=#D4D4D4>></color> <color=#B48EAD>OnEnemyDestroyed</color><color=#D4D4D4>;</color>
+    <color=#569CD6>public</color> System<color=#D4D4D4>.</color>Action<color=#D4D4D4><</color><color=#4EC9B0>BaseEnemy</color><color=#D4D4D4>></color> <color=#B48EAD>OnEnemyKilled</color><color=#D4D4D4>;</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>bool</color> <color=#B48EAD>isActive</color> <color=#D4D4D4>=</color> <color=#569CD6>true</color><color=#D4D4D4>;</color>
+    <color=#569CD6>protected</color> <color=#4EC9B0>Vector3</color> <color=#B48EAD>initialScale</color><color=#D4D4D4>;</color>
+
+    <color=#9B9B9B>#region Unity Lifecycle</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>virtual</color> <color=#569CD6>void</color> <color=#FFA500>Awake</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#B48EAD>initialScale</color> <color=#D4D4D4>=</color> transform<color=#D4D4D4>.</color>localScale<color=#D4D4D4>;</color>
+        
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#B48EAD>spriteRenderer</color> == <color=#569CD6>null</color><color=#D4D4D4>)</color>
+            <color=#B48EAD>spriteRenderer</color> <color=#D4D4D4>=</color> GetComponentInChildren<color=#D4D4D4><</color><color=#4EC9B0>SpriteRenderer</color><color=#D4D4D4>></color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>virtual</color> <color=#569CD6>void</color> <color=#FFA500>Start</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#57A64A>// Auto-find bird if not assigned</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#B48EAD>birdTransform</color> == <color=#569CD6>null</color><color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            var bird <color=#D4D4D4>=</color> FindFirstObjectByType<color=#D4D4D4><</color>Bird<color=#D4D4D4>></color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            <color=#569CD6>if</color> <color=#D4D4D4>(</color>bird != <color=#569CD6>null</color><color=#D4D4D4>)</color>
+                <color=#B48EAD>birdTransform</color> <color=#D4D4D4>=</color> bird<color=#D4D4D4>.</color>transform<color=#D4D4D4>;</color>
+        <color=#D4D4D4>}</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>virtual</color> <color=#569CD6>void</color> <color=#FFA500>Update</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#D4D4D4>!</color><color=#B48EAD>isActive</color><color=#D4D4D4>)</color> <color=#569CD6>return</color><color=#D4D4D4>;</color>
+
+        <color=#57A64A>// Execute enemy-specific behavior</color>
+        <color=#FFA500>ExecuteBehavior</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+        <color=#57A64A>// Check if enemy should be destroyed (off-screen)</color>
+        <color=#FFA500>CheckBounds</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>virtual</color> <color=#569CD6>void</color> <color=#FFA500>OnTriggerEnter2D</color><color=#D4D4D4>(</color>Collider2D collision<color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color><color=#D4D4D4>!</color><color=#B48EAD>isActive</color><color=#D4D4D4>)</color> <color=#569CD6>return</color><color=#D4D4D4>;</color>
+
+        <color=#57A64A>// Check collision with bird</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color>collision<color=#D4D4D4>.</color>TryGetComponent<color=#D4D4D4><</color>Bird<color=#D4D4D4>></color><color=#D4D4D4>(</color><color=#569CD6>out</color> var bird<color=#D4D4D4>)</color><color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            <color=#FFA500>OnHitBird</color><color=#D4D4D4>(</color>bird<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        <color=#D4D4D4>}</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>virtual</color> <color=#569CD6>void</color> <color=#FFA500>OnDestroy</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#B48EAD>OnEnemyDestroyed</color>?<color=#D4D4D4>.</color>Invoke<color=#D4D4D4>(</color><color=#569CD6>this</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#9B9B9B>#endregion</color>
+
+    <color=#9B9B9B>#region Abstract Methods</color>
+
+    /// <summary>
+    /// Main behavior logic - must be implemented by each enemy type
+    /// </summary>
+    <color=#569CD6>protected</color> <color=#569CD6>abstract</color> <color=#569CD6>void</color> <color=#FFA500>ExecuteBehavior</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+    /// <summary>
+    /// Returns the enemy type for identification
+    /// </summary>
+    <color=#569CD6>public</color> <color=#569CD6>abstract</color> EnemyType GetEnemyType();
+
+    #endregion
+
+    #region Virtual Methods
+
+    /// <summary>
+    /// Called when the enemy hits the bird
+ 

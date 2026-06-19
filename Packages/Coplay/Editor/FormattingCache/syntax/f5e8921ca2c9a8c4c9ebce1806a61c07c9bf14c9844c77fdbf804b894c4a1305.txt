@@ -1,0 +1,82 @@
+<color=#569CD6>using</color> UnityEngine<color=#D4D4D4>;</color>
+<color=#569CD6>using</color> UnityEditor<color=#D4D4D4>;</color>
+
+<color=#569CD6>public</color> <color=#569CD6>class</color> <color=#FFA500>SetupEnemySystem</color> <color=#D4D4D4>:</color> <color=#4EC9B0>MonoBehaviour</color>
+<color=#D4D4D4>{</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>MenuItem</color><color=#D4D4D4>(</color><color=#FF69B4>"Tools/Setup Enemy System"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#569CD6>public</color> <color=#569CD6>static</color> <color=#569CD6>void</color> <color=#FFA500>Execute</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#57A64A>// Setup SplitEnemy prefab to reference itself</color>
+        <color=#4EC9B0>string</color> splitEnemyPath <color=#D4D4D4>=</color> <color=#FF69B4>"Assets/Prefabs/Enemies/SplitEnemy.prefab"</color><color=#D4D4D4>;</color>
+        <color=#4EC9B0>GameObject</color> splitPrefab <color=#D4D4D4>=</color> AssetDatabase<color=#D4D4D4>.</color>LoadAssetAtPath<color=#D4D4D4><</color><color=#4EC9B0>GameObject</color><color=#D4D4D4>></color><color=#D4D4D4>(</color>splitEnemyPath<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color>splitPrefab != <color=#569CD6>null</color><color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            <color=#57A64A>// Open prefab for editing</color>
+            <color=#4EC9B0>string</color> assetPath <color=#D4D4D4>=</color> AssetDatabase<color=#D4D4D4>.</color><color=#FFA500>GetAssetPath</color><color=#D4D4D4>(</color>splitPrefab<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            <color=#4EC9B0>GameObject</color> prefabRoot <color=#D4D4D4>=</color> PrefabUtility<color=#D4D4D4>.</color><color=#FFA500>LoadPrefabContents</color><color=#D4D4D4>(</color>assetPath<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            
+            SplitEnemy splitEnemy <color=#D4D4D4>=</color> prefabRoot<color=#D4D4D4>.</color>GetComponent<color=#D4D4D4><</color>SplitEnemy<color=#D4D4D4>></color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            <color=#569CD6>if</color> <color=#D4D4D4>(</color>splitEnemy != <color=#569CD6>null</color><color=#D4D4D4>)</color>
+            <color=#D4D4D4>{</color>
+                <color=#57A64A>// Use SerializedObject to set the splitPrefab field</color>
+                SerializedObject so <color=#D4D4D4>=</color> <color=#569CD6>new</color> SerializedObject<color=#D4D4D4>(</color>splitEnemy<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+                SerializedProperty splitPrefabProp <color=#D4D4D4>=</color> so<color=#D4D4D4>.</color><color=#FFA500>FindProperty</color><color=#D4D4D4>(</color><color=#FF69B4>"splitPrefab"</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+                <color=#569CD6>if</color> <color=#D4D4D4>(</color>splitPrefabProp != <color=#569CD6>null</color><color=#D4D4D4>)</color>
+                <color=#D4D4D4>{</color>
+                    splitPrefabProp<color=#D4D4D4>.</color>objectReferenceValue <color=#D4D4D4>=</color> splitPrefab<color=#D4D4D4>;</color>
+                    so<color=#D4D4D4>.</color><color=#FFA500>ApplyModifiedProperties</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+                <color=#D4D4D4>}</color>
+            <color=#D4D4D4>}</color>
+            
+            <color=#57A64A>// Save prefab</color>
+            PrefabUtility<color=#D4D4D4>.</color><color=#FFA500>SaveAsPrefabAsset</color><color=#D4D4D4>(</color>prefabRoot<color=#D4D4D4>,</color> assetPath<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            PrefabUtility<color=#D4D4D4>.</color><color=#FFA500>UnloadPrefabContents</color><color=#D4D4D4>(</color>prefabRoot<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            
+            <color=#4EC9B0>Debug</color><color=#D4D4D4>.</color><color=#FFA500>Log</color><color=#D4D4D4>(</color><color=#FF69B4>"SplitEnemy prefab configured with self-reference."</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        <color=#D4D4D4>}</color>
+        
+        <color=#57A64A>// Setup EnemySpawner with enemy prefabs</color>
+        EnemySpawner spawner <color=#D4D4D4>=</color> FindFirstObjectByType<color=#D4D4D4><</color>EnemySpawner<color=#D4D4D4>></color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color>spawner != <color=#569CD6>null</color><color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            SerializedObject spawnerSO <color=#D4D4D4>=</color> <color=#569CD6>new</color> SerializedObject<color=#D4D4D4>(</color>spawner<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            SerializedProperty inlineEnemies <color=#D4D4D4>=</color> spawnerSO<color=#D4D4D4>.</color><color=#FFA500>FindProperty</color><color=#D4D4D4>(</color><color=#FF69B4>"inlineEnemies"</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            
+            <color=#57A64A>// Load all enemy prefabs</color>
+            <color=#4EC9B0>GameObject</color> normalPrefab <color=#D4D4D4>=</color> AssetDatabase<color=#D4D4D4>.</color>LoadAssetAtPath<color=#D4D4D4><</color><color=#4EC9B0>GameObject</color><color=#D4D4D4>></color><color=#D4D4D4>(</color><color=#FF69B4>"Assets/Prefabs/Enemies/NormalEnemy.prefab"</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            <color=#4EC9B0>GameObject</color> followPrefab <color=#D4D4D4>=</color> AssetDatabase<color=#D4D4D4>.</color>LoadAssetAtPath<color=#D4D4D4><</color><color=#4EC9B0>GameObject</color><color=#D4D4D4>></color><color=#D4D4D4>(</color><color=#FF69B4>"Assets/Prefabs/Enemies/FollowEnemy.prefab"</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            <color=#4EC9B0>GameObject</color> explodePrefab <color=#D4D4D4>=</color> AssetDatabase<color=#D4D4D4>.</color>LoadAssetAtPath<color=#D4D4D4><</color><color=#4EC9B0>GameObject</color><color=#D4D4D4>></color><color=#D4D4D4>(</color><color=#FF69B4>"Assets/Prefabs/Enemies/ExplodeEnemy.prefab"</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            <color=#4EC9B0>GameObject</color> rotatePrefab <color=#D4D4D4>=</color> AssetDatabase<color=#D4D4D4>.</color>LoadAssetAtPath<color=#D4D4D4><</color><color=#4EC9B0>GameObject</color><color=#D4D4D4>></color><color=#D4D4D4>(</color><color=#FF69B4>"Assets/Prefabs/Enemies/RotateEnemy.prefab"</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            
+            <color=#57A64A>// Clear and setup inline enemies</color>
+            inlineEnemies<color=#D4D4D4>.</color><color=#FFA500>ClearArray</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            
+            <color=#57A64A>// Add NormalEnemy - Level 1+, high weight</color>
+            <color=#FFA500>AddEnemyEntry</color><color=#D4D4D4>(</color>inlineEnemies<color=#D4D4D4>,</color> normalPrefab<color=#D4D4D4>,</color> <color=#B5CEA8>50f</color><color=#D4D4D4>,</color> <color=#B5CEA8>1</color><color=#D4D4D4>,</color> <color=#B5CEA8>0</color><color=#D4D4D4>,</color> <color=#B5CEA8>1f</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            
+            <color=#57A64A>// Add FollowEnemy - Level 2+, medium weight</color>
+            <color=#FFA500>AddEnemyEntry</color><color=#D4D4D4>(</color>inlineEnemies<color=#D4D4D4>,</color> followPrefab<color=#D4D4D4>,</color> <color=#B5CEA8>30f</color><color=#D4D4D4>,</color> <color=#B5CEA8>2</color><color=#D4D4D4>,</color> <color=#B5CEA8>0</color><color=#D4D4D4>,</color> <color=#B5CEA8>0.9f</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            
+            <color=#57A64A>// Add RotateEnemy - Level 2+, medium weight</color>
+            <color=#FFA500>AddEnemyEntry</color><color=#D4D4D4>(</color>inlineEnemies<color=#D4D4D4>,</color> rotatePrefab<color=#D4D4D4>,</color> <color=#B5CEA8>25f</color><color=#D4D4D4>,</color> <color=#B5CEA8>2</color><color=#D4D4D4>,</color> <color=#B5CEA8>0</color><color=#D4D4D4>,</color> <color=#B5CEA8>1f</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            
+            <color=#57A64A>// Add ExplodeEnemy - Level 3+, lower weight</color>
+            <color=#FFA500>AddEnemyEntry</color><color=#D4D4D4>(</color>inlineEnemies<color=#D4D4D4>,</color> explodePrefab<color=#D4D4D4>,</color> <color=#B5CEA8>20f</color><color=#D4D4D4>,</color> <color=#B5CEA8>3</color><color=#D4D4D4>,</color> <color=#B5CEA8>0</color><color=#D4D4D4>,</color> <color=#B5CEA8>0.8f</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+            
+            <color=#57A64A>// Add SplitEnemy - Level 4+, lowest weight (challenging)</color>
+            <color=#FFA500>AddEnemyEntry</color><color=#D4D4D4>(</color>inlineEnemies<color=#D4D4D4>,</color> splitPrefab<color=#D4D4D4>,</color> 15f, 4, 0, 0.85f);
+            
+            spawnerSO.ApplyModifiedProperties();
+            EditorUtility.SetDirty(spawner);
+            
+            Debug.Log("EnemySpawner configured with 5 enemy types.");
+        }
+        else
+        {
+            Debug.LogWarning("EnemySpawner not found in scene!");
+        }
+        
+        Debug.Log("Enemy system setup complete!");
+    }
+    

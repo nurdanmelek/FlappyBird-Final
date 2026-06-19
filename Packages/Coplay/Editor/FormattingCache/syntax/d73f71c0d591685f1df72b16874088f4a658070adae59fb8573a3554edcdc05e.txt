@@ -1,0 +1,106 @@
+<color=#569CD6>using</color> UnityEngine<color=#D4D4D4>;</color>
+
+/// <summary>
+/// Enemy that follows the bird when within detection range.
+/// Uses smooth interpolation for non-aggressive following behavior.
+/// </summary>
+<color=#569CD6>public</color> <color=#569CD6>class</color> <color=#FFA500>FollowEnemy</color> <color=#D4D4D4>:</color> BaseEnemy
+<color=#D4D4D4>{</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Follow Settings"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Distance at which the enemy starts following the bird"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>detectionRange</color> <color=#D4D4D4>=</color> <color=#B5CEA8>8f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"How smoothly the enemy follows (lower = smoother)"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>followSmoothness</color> <color=#D4D4D4>=</color> <color=#B5CEA8>2f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Speed multiplier when following"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>followSpeedMultiplier</color> <color=#D4D4D4>=</color> <color=#B5CEA8>0.7f</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Minimum distance to maintain from bird"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>minDistanceFromBird</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1f</color><color=#D4D4D4>;</color>
+
+    <color=#D4D4D4>[</color><color=#4EC9B0>Header</color><color=#D4D4D4>(</color><color=#FF69B4>"Base Movement"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Continue moving left even when following"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#569CD6>bool</color> <color=#B48EAD>maintainLeftMovement</color> <color=#D4D4D4>=</color> <color=#569CD6>true</color><color=#D4D4D4>;</color>
+    
+    <color=#D4D4D4>[</color><color=#4EC9B0>Tooltip</color><color=#D4D4D4>(</color><color=#FF69B4>"Base left movement speed when following"</color><color=#D4D4D4>)</color><color=#D4D4D4>]</color>
+    <color=#D4D4D4>[</color><color=#4EC9B0>SerializeField</color><color=#D4D4D4>]</color> <color=#569CD6>private</color> <color=#4EC9B0>float</color> <color=#B48EAD>baseLeftSpeed</color> <color=#D4D4D4>=</color> <color=#B5CEA8>1f</color><color=#D4D4D4>;</color>
+
+    <color=#569CD6>private</color> <color=#569CD6>bool</color> <color=#B48EAD>isFollowing</color> <color=#D4D4D4>=</color> <color=#569CD6>false</color><color=#D4D4D4>;</color>
+    <color=#569CD6>private</color> <color=#4EC9B0>Vector3</color> <color=#B48EAD>velocity</color> <color=#D4D4D4>=</color> <color=#4EC9B0>Vector3</color><color=#D4D4D4>.</color>zero<color=#D4D4D4>;</color>
+
+    <color=#569CD6>public</color> <color=#569CD6>override</color> EnemyType <color=#FFA500>GetEnemyType</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color> => EnemyType<color=#D4D4D4>.</color>Follow<color=#D4D4D4>;</color>
+
+    <color=#569CD6>protected</color> <color=#569CD6>override</color> <color=#569CD6>void</color> <color=#FFA500>ExecuteBehavior</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#4EC9B0>float</color> distanceToBird <color=#D4D4D4>=</color> <color=#FFA500>GetDistanceToBird</color><color=#D4D4D4>(</color><color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+        <color=#57A64A>// Check if bird is within detection range</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color>distanceToBird <= <color=#B48EAD>detectionRange</color> && birdTransform != <color=#569CD6>null</color><color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            <color=#B48EAD>isFollowing</color> <color=#D4D4D4>=</color> <color=#569CD6>true</color><color=#D4D4D4>;</color>
+            <color=#FFA500>FollowBird</color><color=#D4D4D4>(</color>distanceToBird<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        <color=#D4D4D4>}</color>
+        <color=#569CD6>else</color>
+        <color=#D4D4D4>{</color>
+            <color=#B48EAD>isFollowing</color> <color=#D4D4D4>=</color> <color=#569CD6>false</color><color=#D4D4D4>;</color>
+            <color=#57A64A>// Default left movement when not following</color>
+            transform<color=#D4D4D4>.</color><color=#FFA500>Translate</color><color=#D4D4D4>(</color><color=#4EC9B0>Vector3</color><color=#D4D4D4>.</color>left <color=#D4D4D4>*</color> moveSpeed <color=#D4D4D4>*</color> <color=#4EC9B0>Time</color><color=#D4D4D4>.</color>deltaTime<color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        <color=#D4D4D4>}</color>
+    <color=#D4D4D4>}</color>
+
+    <color=#569CD6>private</color> <color=#569CD6>void</color> <color=#FFA500>FollowBird</color><color=#D4D4D4>(</color><color=#4EC9B0>float</color> currentDistance<color=#D4D4D4>)</color>
+    <color=#D4D4D4>{</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color>birdTransform == <color=#569CD6>null</color><color=#D4D4D4>)</color> <color=#569CD6>return</color><color=#D4D4D4>;</color>
+
+        <color=#4EC9B0>Vector3</color> targetPosition <color=#D4D4D4>=</color> transform<color=#D4D4D4>.</color>position<color=#D4D4D4>;</color>
+
+        <color=#57A64A>// Only follow if not too close</color>
+        <color=#569CD6>if</color> <color=#D4D4D4>(</color>currentDistance <color=#D4D4D4>></color> <color=#B48EAD>minDistanceFromBird</color><color=#D4D4D4>)</color>
+        <color=#D4D4D4>{</color>
+            <color=#57A64A>// Calculate target position (slightly behind bird's Y position for smoother feel)</color>
+            targetPosition <color=#D4D4D4>=</color> <color=#569CD6>new</color> <color=#4EC9B0>Vector3</color><color=#D4D4D4>(</color>
+                transform<color=#D4D4D4>.</color>position<color=#D4D4D4>.</color>x<color=#D4D4D4>,</color> <color=#57A64A>// Keep X, we'll handle horizontal movement separately</color>
+                birdTransform<color=#D4D4D4>.</color>position<color=#D4D4D4>.</color>y<color=#D4D4D4>,</color>
+                transform<color=#D4D4D4>.</color>position<color=#D4D4D4>.</color>z
+            <color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+
+            <color=#57A64A>// Smooth follow on Y axis</color>
+            transform<color=#D4D4D4>.</color>position <color=#D4D4D4>=</color> <color=#4EC9B0>Vector3</color><color=#D4D4D4>.</color><color=#FFA500>SmoothDamp</color><color=#D4D4D4>(</color>
+                transform<color=#D4D4D4>.</color>position<color=#D4D4D4>,</color>
+                targetPosition<color=#D4D4D4>,</color>
+                <color=#569CD6>ref</color> <color=#B48EAD>velocity</color><color=#D4D4D4>,</color>
+                <color=#B5CEA8>1f</color> <color=#D4D4D4>/</color> <color=#B48EAD>followSmoothness</color>
+            <color=#D4D4D4>)</color><color=#D4D4D4>;</color>
+        <color=#D4D4D4>}</color>
+
+        <color=#57A64A>// Always move left (either base speed or full speed)</color>
+        <color=#4EC9B0>float</color> leftSpeed <color=#D4D4D4>=</color> <color=#B48EAD>maintainLeftMovement</color> ? <color=#B48EAD>baseLeftSpeed</color> <color=#D4D4D4>:</color> moveSpeed <color=#D4D4D4>*</color> <color=#B48EAD>followSpeedMultiplier</color><color=#D4D4D4>;</color>
+        transform<color=#D4D4D4>.</color><color=#FFA500>Translate</color><color=#D4D4D4>(</color>Vector3.left * leftSpeed * Time.deltaTime);
+    }
+
+    /// <summary>
+    /// Check if enemy is currently following the bird
+    /// </summary>
+    public bool IsFollowing()
+    {
+        return isFollowing;
+    }
+
+    /// <summary>
+    /// Set the detection range at runtime
+    /// </summary>
+    public void SetDetectionRange(float range)
+    {
+        detectionRange = range;
+    }
+
+#if UNITY_EDITOR
+    // Visualize detection range in editor
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = isFollowing ? Color.red : Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
+    }
+#endif
+}

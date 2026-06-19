@@ -1,0 +1,44 @@
+Enemy sistemi tamamlandı. İşte oluşturduğum modüler enemy sisteminin özeti:
+
+<size=20>📁 Oluşturulan Dosyalar</size>
+
+<size=18>Scripts (Assets/Scripts/Enemies/)</size>
+| Dosya | Açıklama |
+|-------|----------|
+| <color=#4EC9B0>BaseEnemy.cs</color> | Abstract base class - tüm enemy'ler için ortak fonksiyonlar |
+| <color=#4EC9B0>NormalEnemy.cs</color> | Sadece sola hareket eden basit enemy |
+| <color=#4EC9B0>FollowEnemy.cs</color> | Belirli mesafede kuşu yumuşak takip eden enemy |
+| <color=#4EC9B0>ExplodeEnemy.cs</color> | Yaklaştıkça büyüyen ve ekstra hasar veren enemy |
+| <color=#4EC9B0>SplitEnemy.cs</color> | Öldürüldüğünde iki küçük enemy oluşturan enemy |
+| <color=#4EC9B0>RotateEnemy.cs</color> | Sinüs/dairesel hareket yapan enemy |
+| <color=#4EC9B0>EnemySpawner.cs</color> | Enemy spawn eden ve random seçim yapan sistem |
+| <color=#4EC9B0>EnemySpawnConfig.cs</color> | ScriptableObject config + spawn entry tanımları |
+| <color=#4EC9B0>EnemyManager.cs</color> | Merkezi enemy yönetim sistemi |
+
+<size=18>Prefabs (Assets/Prefabs/Enemies/)</size>
+• <color=#4EC9B0>NormalEnemy.prefab</color>
+• <color=#4EC9B0>FollowEnemy.prefab</color>
+• <color=#4EC9B0>ExplodeEnemy.prefab</color>
+• <color=#4EC9B0>SplitEnemy.prefab</color>
+• <color=#4EC9B0>RotateEnemy.prefab</color>
+
+<size=20>🎮 Enemy Tipleri ve Özellikleri</size>
+
+| Enemy | Level | Davranış |
+|-------|-------|----------|
+| <b>NormalEnemy</b> | 1+ | Sadece sola hareket |
+| <b>FollowEnemy</b> | 2+ | 8 birim mesafede kuşu yumuşak takip |
+| <b>RotateEnemy</b> | 2+ | Sinüs/dairesel hareket (5 farklı pattern) |
+| <b>ExplodeEnemy</b> | 3+ | Yaklaştıkça büyür, +1 ekstra hasar |
+| <b>SplitEnemy</b> | 4+ | Öldürüldüğünde 2 küçük enemy spawn |
+
+<size=20>🔧 Kullanım</size>
+
+<size=18>Inspector'dan Ayarlama</size>
+• <color=#4EC9B0>EnemySpawner</color> component'inde <color=#4EC9B0>Inline Enemies</color> array'ine prefab'ları ekleyebilirsiniz
+• Her enemy için <color=#4EC9B0>spawnWeight</color>, <color=#4EC9B0>minLevel</color>, <color=#4EC9B0>maxLevel</color>, <color=#4EC9B0>speedMultiplier</color> ayarlanabilir
+
+<size=18>ScriptableObject ile Ayarlama</size>
+<color=#57A64A>Assets > Create > Game > Enemy Spawn Config
+</color>
+ile yeni config oluşturup <color=#4EC9B0>EnemySpawner</color>'a at
