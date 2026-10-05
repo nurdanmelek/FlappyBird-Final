@@ -1,8 +1,6 @@
-using DG.Tweening;
-using System;
 using System.Collections;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
+using DG.Tweening;
 
 public class CoinManager : MonoBehaviour
 {

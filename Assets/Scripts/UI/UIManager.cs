@@ -141,4 +141,15 @@ public class UIManager : MonoBehaviour
         gameCompletedUI.Show();
         HideInGameUI();
     }
+
+    public void BackToStartButtonPressed()
+    {
+        gameCompletedUI.Hide();
+
+        gameDirector.currentLevel = 1;
+
+        HideInGameUI();
+
+        mainMenu.Show();
+    }
 }

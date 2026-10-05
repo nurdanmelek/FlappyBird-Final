@@ -95,6 +95,13 @@ public class WordSelectionUI : MonoBehaviour
 
             newButton.Init(this, i, text);
 
+            // Daha önce öğrenilmiş mi?
+            if (wordsManager.completedKeys.Contains(i))
+            {
+                newButton.SetCompleted(true);
+            }
+
+            // Şu anda seçilmiş mi?
             if (_selectedKeys.Contains(i))
             {
                 newButton.SetSelected(true);

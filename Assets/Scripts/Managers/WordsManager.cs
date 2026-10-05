@@ -64,7 +64,7 @@ public class WordsManager : MonoBehaviour
     public void SetSelectedStudyKeys(List<int> selectedKeys)
     {
         selectedStudyKeys.Clear();
-        completedKeys.Clear();
+       
 
         foreach (int key in selectedKeys)
         {
