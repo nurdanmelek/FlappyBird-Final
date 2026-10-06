@@ -150,6 +150,6 @@ public class UIManager : MonoBehaviour
 
         HideInGameUI();
 
-        mainMenu.Show();
+        wordSelectionUI.Show();
     }
 }

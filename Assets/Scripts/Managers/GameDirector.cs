@@ -84,10 +84,25 @@ public class GameDirector : MonoBehaviour
         obstacleManager.StopRun();
         coinManager.StopCoinSpawnCoroutine();
 
+        GamePipeMovement.StopMovement();
+
+        audioManager.StopMusic();
+
         audioManager.StopMusic();
         audioManager.PlayWinAS();
 
-        if (wordsManager.completedKeys.Count >= wordsManager.selectedStudyKeys.Count)
+        bool allSelectedWordsCompleted = true;
+
+        foreach (int key in wordsManager.selectedStudyKeys)
+        {
+            if (!wordsManager.completedKeys.Contains(key))
+            {
+                allSelectedWordsCompleted = false;
+                break;
+            }
+        }
+
+        if (allSelectedWordsCompleted)
         {
             uIManager.ShowGameCompletedUI();
             return;
@@ -101,7 +116,8 @@ public class GameDirector : MonoBehaviour
 
     public void RestartLevel()
     {
-        
+
+        GamePipeMovement.StartMovement();
 
         obstacleSpawner.Init(); // sadece ba��ml�l�klar� haz�rla (kamera vs)
         obstacleManager.Init(obstacleSpawner, GetPipeSpeed(), GetSpawnDistance(), _destroyX);
